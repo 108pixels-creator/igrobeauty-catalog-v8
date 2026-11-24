@@ -1,0 +1,62 @@
+/* подвал сайта – общий для главной и страниц каталога (v8, 24.11). Схема: output/2026-11-24_footer-optimization/footer-wireframe.html.
+   Разметку вставляет tools/build_home.py во все страницы v8; правки подвала – в main/v4-ds32/_work/footer/footer-desktop.html и build_home.py */
+/* подвал – по схеме footer-wireframe.html (24.11), классы .ft как в схеме */
+.ft { background: #335351; color: #fff; font-family: var(--font-ui); }
+.ft a { color: inherit; text-decoration: none; }
+.ft__in { max-width: 1280px; margin: 0 auto; padding: 0 40px; }
+.ft__main { display: grid; grid-template-columns: 1.5fr repeat(4, 1fr); gap: 40px; padding: 48px 0 40px; }
+.ft__contact { padding-right: 32px; border-right: 1px solid rgba(255,255,255,.12); }
+.ft__eyebrow { margin: 0 0 12px; font-family: var(--font-heading); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.7); }
+.ft__phone { display: block; font-family: var(--font-heading); font-weight: 700; font-size: 24px; line-height: 1.3; }
+.ft__hours { margin: 8px 0 16px; font-size: 15px; color: rgba(255,255,255,.7); }
+.ft__msg { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.ft__chip { display: inline-flex; align-items: center; height: 44px; padding: 0 10px; border: 1px solid rgba(255,255,255,.4); border-radius: 4px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+.ft__chip--solid { background: #fff; color: #335351 !important; border-color: #fff; }
+.ft__line { margin: 4px 0; font-size: 15px; }
+.ft__line span { color: rgba(255,255,255,.7); }
+.ft__line a { text-decoration: underline; text-underline-offset: 3px; }
+.ft__col h3 { margin: 0 0 16px; font-family: var(--font-heading); font-weight: 700; font-size: 16px; white-space: nowrap; }
+.ft__col ul { list-style: none; margin: 0; padding: 0; }
+.ft__col li { margin: 0 0 12px; font-size: 15px; line-height: 1.35; }
+.ft__col li a { color: rgba(255,255,255,.7); }
+.ft__col li.is-key a { color: #fff; font-weight: 600; }
+.ft__col li.is-club a { color: #dfc49d; font-weight: 600; }
+.ft__col li.is-minor a { font-size: 14px; }
+@media (hover: hover) { .ft__col li a:hover, .ft__soc:hover { color: #fff !important; text-decoration: underline; text-underline-offset: 3px; } }
+.ft__social { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 0; border-top: 1px solid rgba(255,255,255,.12); font-size: 15px; }
+.ft__social-txt { color: rgba(255,255,255,.7); }
+.ft__social-list { display: flex; gap: 8px; }
+.ft__soc { display: inline-flex; align-items: center; height: 36px; padding: 0 12px; border: 1px solid rgba(255,255,255,.12); border-radius: 4px; color: rgba(255,255,255,.7) !important; font-size: 14px; }
+.ft__legal { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 32px; padding: 20px 0 28px; border-top: 1px solid rgba(255,255,255,.12); font-size: 13px; color: rgba(255,255,255,.7); }
+.ft__legal nav { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.ft__legal a { text-decoration: underline; text-underline-offset: 3px; }
+.ft__pro { max-width: 440px; }
+.ft .ig-proto { color: rgba(255,255,255,.55); background: #335351; }
+.ft .ig-proto a, .ft .ig-proto button { color: rgba(255,255,255,.8); }
+
+/* подвал телефона – по схеме footer-wireframe.html, раздел 3; на десктопе скрыт */
+.ftm { display: none; }
+
+@media (max-width: 767px) {
+  /* подвал: десктопный скрыт, телефонный – по схеме */
+  .ft__in { display: none; }
+  .ftm { display: block; padding: 24px 16px 4px; color: #fff; }
+  .ftm__call { display: flex; align-items: center; justify-content: center; height: 52px; margin-bottom: 8px; border-radius: 4px; background: #fff; color: #335351 !important; font-family: var(--font-heading); font-weight: 700; font-size: 18px; }
+  .ftm__row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+  .ftm__row a { display: flex; align-items: center; justify-content: center; height: 44px; border: 1px solid rgba(255,255,255,.4); border-radius: 4px; font-size: 15px; font-weight: 600; }
+  .ftm__hours { margin: 0 0 20px; font-size: 14px; color: rgba(255,255,255,.7); }
+  .ftm__hours a { text-decoration: underline; text-underline-offset: 3px; }
+  .ftm__acc { border-top: 1px solid rgba(255,255,255,.12); }
+  .ftm__acc summary { display: flex; align-items: center; justify-content: space-between; min-height: 52px; list-style: none; font-family: var(--font-heading); font-weight: 700; font-size: 16px; cursor: pointer; }
+  .ftm__acc summary::-webkit-details-marker { display: none; }
+  .ftm__pm::before { content: "+"; font-weight: 400; font-size: 22px; color: rgba(255,255,255,.7); }
+  .ftm__acc[open] .ftm__pm::before { content: "–"; }
+  .ftm__acc ul { list-style: none; margin: 0; padding: 0 0 12px; }
+  .ftm__acc li { display: flex; align-items: center; min-height: 44px; font-size: 16px; }
+  .ftm__acc li a { color: rgba(255,255,255,.7); }
+  .ftm__acc li.is-club a { color: #dfc49d; font-weight: 600; }
+  .ftm__soc { display: flex; gap: 8px; padding: 16px 0; border-top: 1px solid rgba(255,255,255,.12); }
+  .ftm__soc a { flex: 1; display: flex; align-items: center; justify-content: center; height: 44px; border: 1px solid rgba(255,255,255,.12); border-radius: 4px; font-size: 14px; color: rgba(255,255,255,.7); }
+  .ftm__legal { padding: 16px 0 20px; border-top: 1px solid rgba(255,255,255,.12); font-size: 13px; color: rgba(255,255,255,.7); }
+  .ftm__legal a { display: block; margin-top: 8px; text-decoration: underline; text-underline-offset: 3px; }
+}

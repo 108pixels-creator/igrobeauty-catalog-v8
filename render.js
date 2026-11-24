@@ -950,7 +950,7 @@
       '<div class="ig-card__price"><div class="ig-card__price-l">' +
       '<span class="ig-card__price-v" data-unit="' + p.r + '">' + esc(rub(p.r)) + '</span>' +
       '<span class="ig-card__price-n">Розничная цена</span></div>' +
-      '<button type="button" class="ig-card__pro" data-pro-price>Узнать<br>проф.&nbsp;цену</button></div>' +
+      '<button type="button" class="ig-card__pro" data-pro-price>Узнать<br> проф.&nbsp;цену</button></div>' +
       '<div class="ig-card__controls">' + controls + '</div>' +
       '</article>';
   }
@@ -989,10 +989,37 @@
     }
     var pages = Math.ceil(list.length / PER_PAGE);
     if (state.page > pages) state.page = pages;
+    /* телефон (этап 6, 24.11): вместо страниц – «Показать ещё», видны все страницы с первой по текущую */
+    if (phoneMQ.matches) {
+      var shown = list.slice(0, state.page * PER_PAGE);
+      el.innerHTML = '<div class="ig-grid">' + shown.map(cardHTML).join('') + '</div>' + moreHTML(list.length, shown.length);
+      alignBrandlines();
+      return;
+    }
     var start = (state.page - 1) * PER_PAGE;
     var page = list.slice(start, start + PER_PAGE);
     el.innerHTML = '<div class="ig-grid">' + page.map(cardHTML).join('') + '</div>' + pagerHTML(pages);
     alignBrandlines();
+  }
+  function moreHTML(total, shown) {
+    if (shown >= total) return '';
+    var next = Math.min(PER_PAGE, total - shown);
+    return '<div class="ig-more"><p class="ig-more__n">Показано ' + NUM(shown) + ' из ' + goods(total) + '</p>' +
+      '<button type="button" class="igro-btn igro-btn--secondary ig-more__btn" data-more>Показать ещё ' + goods(next) + '</button></div>';
+  }
+  /* «Показать ещё»: следующая порция дописывается в конец сетки, страница не прыгает */
+  function showMore() {
+    var list = sortItems(filtered(sel));
+    state.page++;
+    var from = (state.page - 1) * PER_PAGE, add = list.slice(from, from + PER_PAGE);
+    var grid = document.querySelector('#ig-content .ig-grid'), more = document.querySelector('#ig-content .ig-more');
+    if (!grid || !add.length) { renderContent(); return; }
+    grid.insertAdjacentHTML('beforeend', add.map(cardHTML).join(''));
+    var shown = Math.min(list.length, state.page * PER_PAGE);
+    if (more) more.outerHTML = moreHTML(list.length, shown);
+    alignBrandlines();
+    var first = grid.children[from];
+    if (first) { var f = first.querySelector('.ig-card__link'); if (f) f.focus({ preventScroll: true }); }
   }
   /* строка «бренд · серия» занимает одну или две строки — в ряду карточек высота выравнивается по самой высокой,
      чтобы названия стояли на одной линии */
@@ -1116,7 +1143,7 @@
       if (chips[i].getAttribute('aria-pressed') !== 'true') chips[i].hidden = true;
     }
   }
-  phoneMQ.addEventListener('change', function () { if (document.getElementById('ig-tb')) renderToolbar(); });
+  phoneMQ.addEventListener('change', function () { if (document.getElementById('ig-tb')) { renderToolbar(); renderContent(); } });
   function clampRows() {
     if (phoneMQ.matches) return;   /* на телефоне бренды и типы – в листе фильтров, в ленте только выбранное: прятать нечего */
     clampBrands();
@@ -1554,6 +1581,7 @@
       return;
     }
 
+    if (t.closest('[data-more]')) { showMore(); return; }
     /* страницы */
     var pg = t.closest('[data-page]');
     if (pg && !pg.disabled) {

@@ -2287,3 +2287,24 @@ body.igro[data-page="home"] .ig-footer { margin-top: 76px; }
   }
   .ig-drawer__head { cursor: grab; }
 }
+
+/* ==========================================================================
+   КАРТОЧКИ И СПИСОК НА ТЕЛЕФОНЕ (v8, этап 6, 24.11.2026) – по аудиту output/2026-11-24_v8-mobile-audit
+   · «Узнать проф. цену» – одной строкой под ценой и «Розничной ценой», область нажатия 32 px;
+   · бренд и линия – та же строка на вид, нажимаются по высоте 32 px (поля 7 px сверху и снизу, внешние отступы −7);
+   · от цены до кнопок – 12 px вместо 31;
+   · вместо страниц – «Показать ещё N товаров» и «Показано X из Y» (render.js: moreHTML, showMore)
+   ========================================================================== */
+@media (max-width: 767px) {
+  .ig-card__price { flex-direction: column; align-items: center; gap: 2px; }
+  .ig-card__price-l { align-items: center; text-align: center; }
+  .ig-card__pro { display: inline-flex; align-items: center; min-height: 32px; margin: -4px 0 -6px; padding: 0 8px; text-align: center; }
+  .ig-card__pro br { display: none; }
+  .ig-card__controls { padding-top: 12px; }
+  .ig-card__brandrow .ig-card__brand,
+  .ig-card__brandrow .ig-card__line { padding-block: 7px; margin-block: -7px; }
+
+  .ig-more { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); margin-top: var(--space-7); }
+  .ig-more__n { margin: 0; font-size: var(--font-size-body-sm); color: var(--text-muted); }
+  .ig-more__btn { width: 100%; --action-cta: #335351; --wash-cta: rgba(51, 83, 81, 0.08); }
+}
