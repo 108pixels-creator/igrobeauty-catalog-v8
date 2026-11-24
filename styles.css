@@ -2308,3 +2308,19 @@ body.igro[data-page="home"] .ig-footer { margin-top: 76px; }
   .ig-more__n { margin: 0; font-size: var(--font-size-body-sm); color: var(--text-muted); }
   .ig-more__btn { width: 100%; --action-cta: #335351; --wash-cta: rgba(51, 83, 81, 0.08); }
 }
+
+/* «Фильтры» на телефоне – квадратная кнопка с иконкой (24.11, Антон); число выбранных – кружком в углу */
+@media (max-width: 767px) {
+  .ig-toolbar .ig-filters-btn--icon {
+    position: relative;
+    width: var(--size-control-sm); height: var(--size-control-sm);
+    padding: 0; gap: 0; justify-content: center;
+  }
+  .ig-filters-btn__badge {
+    position: absolute; top: -7px; right: -7px;
+    min-width: 18px; height: 18px; padding: 0 4px; box-sizing: border-box;
+    border: 2px solid var(--surface-page); border-radius: 9px;
+    background: #3c8883; color: #fff;
+    font-size: 10px; font-weight: var(--weight-bold); line-height: 14px; text-align: center;
+  }
+}

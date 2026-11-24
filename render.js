@@ -851,6 +851,11 @@
     line.insertAdjacentHTML('beforeend', ['y', 'c', 'a'].map(function (k) {
       return sel[k].map(function (v) { return removableTag(k, v, v); }).join('');
     }).join(''));
+    /* «Фильтры» на телефоне – одна иконка (24.11, Антон); сколько выбрано – кружком на иконке */
+    var nSel = panelSelected(sel);
+    fbtn.classList.add('ig-filters-btn--icon');
+    fbtn.innerHTML = ic('filter', 20) + (nSel ? '<span class="ig-filters-btn__badge" aria-hidden="true">' + nSel + '</span>' : '');
+    fbtn.setAttribute('aria-label', 'Фильтры' + (nSel ? ', выбрано: ' + nSel : ''));
     right.appendChild(fbtn);
     if (line.children.length) row.parentNode.insertBefore(line, row.nextSibling);
   }
