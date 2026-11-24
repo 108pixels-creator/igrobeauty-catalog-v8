@@ -2243,76 +2243,47 @@ body.igro[data-page="home"] .ig-footer { margin-top: 76px; }
 }
 
 /* ==========================================================================
-   ПАНЕЛЬ ФИЛЬТРОВ НА ТЕЛЕФОНЕ – ВАРИАНТЫ ДЛЯ ВЫБОРА (v8, этап 5, 24.11.2026)
-   body.ig-mf-a / -b / -c ставит render.js по ?mf=; разметку перестраивает phoneToolbar(). Общее для вариантов:
-   типы продукта – чипами в ленте, ленты листаются вбок до краёв экрана, над сеткой 16 px вместо 48,
-   ряд групп – по высоте пилюли. body.ig-mfs (?mfs=1) – лист фильтров шторкой снизу, как меню телефона
+   ПАНЕЛЬ ФИЛЬТРОВ НА ТЕЛЕФОНЕ (v8, этап 5, 24.11.2026) – вариант C «минимум» и лист шторкой (выбор Антона)
+   · одна строка: счётчик слева, сортировка и «Фильтры» справа;
+   · бренды, типы и прочее – только в листе фильтров; всё выбранное (бренд, линия, продукт, тип, страна, область) –
+     чипами с крестиком лентой под строкой, листается вбок до краёв экрана; отдельной строки «Тип продукта» нет;
+   · над сеткой 16 px вместо 48, ряд групп – по высоте пилюли;
+   · лист фильтров – шторкой снизу, как меню телефона: отступ сверху 56, скругление 28, ручка; свайп вниз закрывает.
+   Разметку перестраивает phoneToolbar() в render.js, свайп – script.js. Варианты A и B и сравнение – в истории git (9993cc4)
    ========================================================================== */
 @media (max-width: 767px) {
-  .ig-mf .ig-content { padding-top: var(--space-4); }
-  .ig-mf .ig-directions { padding-block: 0; }
-  .ig-mf .ig-directions__track { padding-block: var(--space-2); }
-  .ig-mf .ig-toolbar__panel { padding-block: var(--space-3); }
-  .ig-mf .ig-toolbar__row { gap: var(--space-2); }
+  .ig-content { padding-top: var(--space-4); }
+  .ig-directions { padding-block: 0; }
+  /* сверху 16 – над пилюлей выступает иконка (14 px), снизу 8 */
+  .ig-directions__track,
+  .ig-directions__track:has(.ig-direction--icon) { padding-block: var(--space-4) var(--space-2); }
+  .ig-toolbar__panel { padding-block: var(--space-3); }
 
-  /* лента: одна строка, листается вбок, край экрана – без полей контейнера */
+  .ig-toolbar__left { display: none; }
+  .ig-toolbar__right { width: 100%; gap: var(--space-3); margin-left: 0; }
+  .ig-toolbar .ig-count { margin-right: auto; }
+  .ig-toolbar .ig-filters-btn { min-width: 0 !important; padding-inline: var(--space-3); }
+
+  /* лента выбранного */
   .ig-mf-line {
     display: flex; align-items: center; gap: var(--space-2);
+    margin: var(--space-3) calc(-1 * var(--gutter-sm)) 0; padding-inline: var(--gutter-sm);
     overflow-x: auto; scrollbar-width: none;
-    margin-inline: calc(-1 * var(--gutter-sm)); padding-inline: var(--gutter-sm);
-    min-width: 0;
   }
   .ig-mf-line::-webkit-scrollbar { display: none; }
   .ig-mf-line > * { flex: none; }
-  .ig-mf-line > .igro-tag[hidden] { display: inline-flex; }
-  .ig-mf-sep { width: 1px; height: 20px; background: var(--border-default); }
-
-  /* типы продукта чипами – как чипы брендов */
-  .ig-mf .ig-tchip {
-    display: inline-flex; align-items: center;
-    height: var(--size-control-sm); padding: 0 var(--space-3); box-sizing: border-box;
-    border: 1px solid var(--border-default); border-radius: var(--radius-pill);
-    background: var(--surface-card); color: var(--text-default);
-    font-size: var(--font-size-body-sm); font-weight: var(--weight-regular); text-decoration: none; white-space: nowrap;
-  }
-  .ig-mf .ig-tchip[aria-pressed="true"] { border-color: var(--surface-inverse); background: var(--surface-inverse); color: var(--text-on-dark); font-weight: var(--weight-regular); }
-
-  /* A – одна лента: «Фильтры» первым в ленте, ниже счётчик и сортировка */
-  .ig-mf-a .ig-toolbar__row { flex-direction: column; align-items: stretch; }
-  .ig-mf-a .ig-toolbar__left { display: block; flex: none; width: 100%; }
-  .ig-mf-a .ig-toolbar__right { width: 100%; justify-content: space-between; }
-
-  /* B – две кнопки пополам, ниже лента */
-  .ig-mf-b .ig-toolbar__row { flex-wrap: nowrap; }
-  .ig-mf-b .ig-toolbar__left { flex-wrap: nowrap; gap: var(--space-2); width: 100%; }
-  .ig-mf-b .ig-toolbar__left > * { flex: 1 1 0; min-width: 0 !important; }
-  .ig-mf-b .ig-toolbar__right { display: none; }
-  .ig-mf-b .ig-sortwrap { display: flex; }
-  .ig-mf-b .ig-sort {
-    flex: 1; justify-content: center; gap: var(--space-1);
-    height: var(--size-control-sm); padding: 0 var(--space-3);
-    border: 1px solid var(--border-default); border-radius: var(--radius-control, 4px); background: var(--surface-card);
-    white-space: nowrap;
-  }
-  .ig-mf-b .ig-sortmenu { left: auto; right: 0; }
-  .ig-mf-b .ig-mf-line { margin-top: var(--space-3); }
-
-  /* C – минимум: счётчик, сортировка, «Фильтры» одной строкой; лента – только выбранное */
-  .ig-mf-c .ig-toolbar__left { display: none; }
-  .ig-mf-c .ig-toolbar__right { width: 100%; gap: var(--space-3); }
-  .ig-mf-c .ig-count { margin-right: auto; }
-  .ig-mf-c .ig-filters-btn { min-width: 0 !important; padding-inline: var(--space-3); }
-  .ig-mf-c .ig-mf-line { margin-top: var(--space-3); }
-
-  /* лист фильтров шторкой снизу: отступ сверху 56, скругление 28, ручка – как у меню телефона */
-  .ig-mfs .ig-drawer {
-    top: 56px; height: auto; bottom: 0;
+  /* лист фильтров шторкой снизу */
+  .ig-drawer {
+    top: 56px; bottom: 0; height: auto;
     border-radius: 28px 28px 0 0;
     background: var(--surface-card);
     transform: translateY(100%);
+    touch-action: pan-y;
   }
-  .ig-mfs .ig-drawer.is-open { transform: translateY(0); }
-  .ig-mfs .ig-drawer::before {
+  .ig-drawer.is-open { transform: translateY(0); }
+  .ig-drawer.is-dragging { transition: none; }
+  .ig-drawer::before {
     content: ""; display: block; flex: none; width: 40px; height: 5px; margin: 10px auto 0; border-radius: 3px; background: #d6d6d2;
   }
+  .ig-drawer__head { cursor: grab; }
 }

@@ -469,10 +469,8 @@
     var D = window.IG_DATA;
     var mq = window.matchMedia('(max-width: 767px)');
     if (!D || !D.nodes || !document.querySelector('[data-mburger]')) return;
-    var q = new URLSearchParams(location.search), keep = [];
-    if (q.get('cards') === 'sku') keep.push('cards=sku');
-    ['mf', 'mfs'].forEach(function (k) { if (q.get(k)) keep.push(k + '=' + encodeURIComponent(q.get(k))); });
-    var href = function (h) { return !h || h === '#' || !keep.length ? (h || '#') : h + (h.indexOf('?') > -1 ? '&' : '?') + keep.join('&'); };
+    var sku = new URLSearchParams(location.search).get('cards') === 'sku';
+    var href = function (h) { return !h || h === '#' || !sku ? (h || '#') : h + (h.indexOf('?') > -1 ? '&' : '?') + 'cards=sku'; };
     var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
     /* разделы – подписи и порядок как в полосе категорий и в макете C-4 */
     var CATS = [['Для волос', 'hair'], ['Депиляция', 'depilation'], ['Брови и ресницы', 'brows'], ['Косметология', 'cosmetology'],
@@ -665,5 +663,40 @@
     };
     panel.addEventListener('pointerup', endDrag);
     panel.addEventListener('pointercancel', endDrag);
+  })();
+
+  /* лист фильтров на телефоне – шторка (этап 5, 24.11): свайп вниз за ручку и заголовок закрывает, как у меню */
+  (function () {
+    var mq = window.matchMedia('(max-width: 767px)');
+    Array.prototype.forEach.call(document.querySelectorAll('.ig-drawer'), function (dr) {
+      var drag = null;
+      dr.addEventListener('pointerdown', function (e) {
+        if (!mq.matches || !dr.classList.contains('is-open')) return;
+        var head = dr.querySelector('.ig-drawer__head');
+        var inHead = head && head.contains(e.target), onGrab = e.target === dr && e.clientY - dr.getBoundingClientRect().top < 30;
+        if (!(inHead || onGrab) || e.target.closest('button')) return;
+        drag = { y: e.clientY, t: Date.now(), dy: 0 };
+        dr.setPointerCapture(e.pointerId);
+        dr.classList.add('is-dragging');
+      });
+      dr.addEventListener('pointermove', function (e) {
+        if (!drag) return;
+        drag.dy = Math.max(0, e.clientY - drag.y);
+        dr.style.transform = 'translateY(' + drag.dy + 'px)';
+      });
+      var end = function () {
+        if (!drag) return;
+        var shut = drag.dy > 100 || (drag.dy > 30 && drag.dy / Math.max(1, Date.now() - drag.t) > 0.6);
+        dr.classList.remove('is-dragging');
+        drag = null;
+        if (!shut) { dr.style.transform = ''; return; }
+        /* вниз с того места, где отпустили; потом сдвиг снимается – следующее открытие снова снизу вверх */
+        dr.style.transform = 'translateY(100%)';
+        closeAll();
+        setTimeout(function () { dr.style.transform = ''; }, 400);
+      };
+      dr.addEventListener('pointerup', end);
+      dr.addEventListener('pointercancel', end);
+    });
   })();
 })();
