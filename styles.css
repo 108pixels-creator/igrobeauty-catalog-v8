@@ -1,0 +1,2014 @@
+/* ==========================================================================
+   IGRObeauty — каталог v8: стили страниц поверх дизайн-системы.
+   Дизайн-система — DS 3.0 (igro-design-system/igrobeauty-ds, метка ds-3.0; в Figma — «0. Design System 3.0»),
+   копия лежит в ds/ и подключается раньше этого файла: токены, base.css и компоненты igro-*.
+
+   Правила ДС, которым следует файл:
+   · только семантические токены: цвет --text-* / --surface-* / --border-* / --action-*, размеры --font-size-*,
+     отступы --space-*, радиусы по роли, слои --z-*;
+   · наведение — только внутри @media (hover: hover), нажатие — :active со scale(var(--press-scale));
+   · фокус с клавиатуры — общий :focus-visible из ds/tokens/base.css, здесь его не убираем;
+   · где у ДС есть компонент (кнопка, чип, крошки, пагинация, меню, чекбокс, переключатель, аккордеон,
+     счётчик, цена, тост, пустое состояние) — разметка использует его классы igro-*, а здесь только раскладка.
+   Значения не из ДС помечены комментарием: это геометрия из макетов Figma или цвета, взятые с картинок.
+   ========================================================================== */
+
+/* ==========================================================================
+   ИКОНКИ — пути из набора ДС (components/core/Icon.jsx: сетка 24, линия 2, скруглённые концы).
+   Рисуются маской, цвет берут из currentColor. Стрелки влево и фильтра в наборе нет — они из Lucide (readme §11).
+   ========================================================================== */
+.ig-ic {
+  display: inline-block;
+  flex: none;
+  width: 20px; height: 20px;
+  background-color: currentColor;
+  -webkit-mask: var(--ic) center / contain no-repeat;
+  mask: var(--ic) center / contain no-repeat;
+}
+.ig-ic-14 { width: 14px; height: 14px; }
+.ig-ic-16 { width: 16px; height: 16px; }
+.ig-ic-18 { width: 18px; height: 18px; }
+.ig-ic-20 { width: 20px; height: 20px; }
+.ig-ic-22 { width: 22px; height: 22px; }
+.ig-ic-24 { width: 24px; height: 24px; }
+.ig-ic--search      { --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M11%2018C14.866%2018%2018%2014.866%2018%2011C18%207.13401%2014.866%204%2011%204C7.13401%204%204%207.13401%204%2011C4%2014.866%207.13401%2018%2011%2018Z%27/%3E%3Cpath%20d=%27M21%2021L17%2017%27/%3E%3C/svg%3E"); }
+.ig-ic--heart       { --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M19%2014C20.49%2012.54%2022%2010.79%2022%208.5C22%207.04131%2021.4205%205.64236%2020.3891%204.61091C19.3576%203.57946%2017.9587%203%2016.5%203C14.74%203%2013.5%203.5%2012%205C10.5%203.5%209.26%203%207.5%203C6.04131%203%204.64236%203.57946%203.61091%204.61091C2.57946%205.64236%202%207.04131%202%208.5C2%2010.8%203.5%2012.55%205%2014L12%2021L19%2014Z%27/%3E%3C/svg%3E"); }
+.ig-ic--user        { --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M19%2021V19C19%2017.9391%2018.5786%2016.9217%2017.8284%2016.1716C17.0783%2015.4214%2016.0609%2015%2015%2015H9C7.93913%2015%206.92172%2015.4214%206.17157%2016.1716C5.42143%2016.9217%205%2017.9391%205%2019V21%27/%3E%3Cpath%20d=%27M12%2011C14.2091%2011%2016%209.20914%2016%207C16%204.79086%2014.2091%203%2012%203C9.79086%203%208%204.79086%208%207C8%209.20914%209.79086%2011%2012%2011Z%27/%3E%3C/svg%3E"); }
+.ig-ic--cart        { --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M6%202L3%206V20C3%2020.5304%203.21071%2021.0391%203.58579%2021.4142C3.96086%2021.7893%204.46957%2022%205%2022H19C19.5304%2022%2020.0391%2021.7893%2020.4142%2021.4142C20.7893%2021.0391%2021%2020.5304%2021%2020V6L18%202H6Z%27/%3E%3Cpath%20d=%27M3%206H21%27/%3E%3Cpath%20d=%27M16%2010C16%2011.0609%2015.5786%2012.0783%2014.8284%2012.8284C14.0783%2013.5786%2013.0609%2014%2012%2014C10.9391%2014%209.92172%2013.5786%209.17157%2012.8284C8.42143%2012.0783%208%2011.0609%208%2010%27/%3E%3C/svg%3E"); }
+.ig-ic--grid        { --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M4%2013H11V4H4V13ZM13%2020H20V11H13V20ZM13%204V9H20V4H13ZM4%2020H11V15H4V20Z%27/%3E%3C/svg%3E"); }
+.ig-ic--arrow-left  { --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M19%2012H5M11%2018L5%2012L11%206%27/%3E%3C/svg%3E"); }
+.ig-ic--arrow-right { --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M5%2012H19M13%2018L19%2012L13%206%27/%3E%3C/svg%3E"); }
+.ig-ic--filter      { --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M3%206H21M7%2012H17M10%2018H14%27/%3E%3C/svg%3E"); }
+.ig-ic--close       { --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M6%206L18%2018M18%206L6%2018%27/%3E%3C/svg%3E"); }
+.ig-ic--chevron     { --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M6%209L12%2015L18%209%27/%3E%3C/svg%3E"); }
+.ig-ic--chevron-left{ --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M15%206L9%2012L15%2018%27/%3E%3C/svg%3E"); }
+.ig-ic--chevron-right{ --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M9%206L15%2012L9%2018%27/%3E%3C/svg%3E"); }
+.ig-ic--check       { --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M5%2013L9%2017L19%207%27/%3E%3C/svg%3E"); }
+.ig-ic--plus        { --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M12%205V19M5%2012H19%27/%3E%3C/svg%3E"); }
+.ig-ic--minus       { --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M5%2012H19%27/%3E%3C/svg%3E"); }
+
+/* ==========================================================================
+   ОСНОВА — фон, шрифт и цвет текста задаёт body.igro (ds/tokens/base.css)
+   ========================================================================== */
+html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; }
+/* заливка текущего раздела в ряду чипов групп. Цвет #50A27B задан пользователем 12.10,
+   в палитре ДС его нет. Белый текст на нём — 3,1:1, ниже AA для текста 14–16 px */
+:root { --ig-on: #50a27b; }
+img { display: block; max-width: 100%; }
+button { font-family: inherit; letter-spacing: inherit; }
+a { color: var(--text-link); text-decoration: none; }
+ul { margin: 0; padding: 0; list-style: none; }
+
+.ig-container {
+  max-width: var(--container-xl);
+  margin: 0 auto;
+  padding-inline: var(--gutter-lg);
+}
+
+/* ==========================================================================
+   ВЕРХНЯЯ ПОЛОСА — по макету Figma «IB — my DESIGN», узел 2589:3889 (12.10.2026): бирюзовая, 34 px.
+   Цвет #3C8883 — из макета, в палитре ДС его нет (ближайший — Info Teal #2D747E); белый текст на нём — 4,2:1.
+   Шрифт макета Ubuntu заменён шрифтами ДС, кегль надписи 12 px — нижним пределом шкалы 13 px
+   ========================================================================== */
+.ig-topbar {
+  --ig-topbar: #3c8883;
+  background: var(--ig-topbar);
+  color: var(--text-on-dark);
+  font-size: var(--font-size-micro);
+}
+.ig-topbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 34px;
+  padding-block: var(--space-1);
+}
+.ig-topbar__promo {
+  text-transform: uppercase;
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-looser);
+}
+.ig-topbar__contacts {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: var(--font-size-body-sm);
+  color: var(--text-on-dark);
+  white-space: nowrap;
+}
+.ig-topbar__contacts a { color: var(--text-on-dark); text-underline-offset: 2px; }
+.ig-topbar__sep { width: 1px; height: 20px; background: var(--decor-on-dark); }
+@media (hover: hover) {
+  .ig-topbar__contacts a:hover { color: var(--text-on-dark); text-decoration: underline; }
+}
+
+/* ==========================================================================
+   ШАПКА: логотип · поиск (SearchField) · действия (IconButton)
+   ========================================================================== */
+.ig-header { background: var(--surface-card); border-bottom: 1px solid var(--border-subtle); }
+.ig-header__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding-block: var(--space-3);
+}
+/* логотип — по макету 2589:3889: знак, под ним «ИГРО», справа девиз и «— 22 года с вами —».
+   Цвета и кегль слова «ИГРО» — цвета логотипа из макета, не токены ДС */
+.ig-logo {
+  --logo-ink: #335351;
+  --logo-green: #50a27b;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  color: var(--text-default);
+}
+.ig-logo__mark { display: flex; flex-direction: column; align-items: center; gap: var(--space-1); }
+.ig-logo__img { display: block; width: 65px; height: auto; }
+.ig-logo__word {
+  margin-right: -0.15em;             /* разрядка не добавляет хвост справа — слово стоит ровно по центру знака */
+  font-family: var(--font-heading);
+  font-weight: var(--weight-semibold);
+  font-size: 19px;
+  line-height: 1;
+  letter-spacing: 0.15em;
+  color: var(--logo-ink);
+}
+.ig-logo__tagline { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); text-align: center; }
+.ig-logo__motto { font-size: var(--font-size-body); line-height: 1.05; color: var(--text-default); }
+.ig-logo__years {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-body);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--mast-mark-accent, #3c8883);   /* 27.10: как полосы знака – цвет плашки «Скидка 15 %» (.ig-topbar), на тёмном фоне #6BB5B0; было --logo-green */
+}
+.ig-logo__years::before,
+.ig-logo__years::after { content: ""; width: var(--space-2); height: 1px; background: currentColor; }
+.ig-search { flex: 1 1 auto; }
+.ig-search .igro-search__input { min-width: 0; }
+
+.ig-actions { flex: none; display: flex; align-items: center; gap: var(--space-2); }
+/* «Вход / Регистрация» — кнопка с подписью в стиле ghost IconButton */
+.ig-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--size-control-md);
+  padding: 0 var(--space-2_5);
+  border: 0;
+  border-radius: var(--radius-field);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--font-size-body-sm);
+  cursor: pointer;
+  transition: background var(--duration-fast) ease, color var(--duration-fast) ease, transform var(--duration-fast) ease;
+}
+.ig-action:active { transform: scale(var(--press-scale)); }
+@media (hover: hover) {
+  .ig-action:hover { background: var(--surface-sunken); color: var(--text-default); }
+}
+/* корзина в шапке (имитация): кружок с числом товаров на иконке и сумма рядом — как в шапке макета 2589:3889.
+   Кружок — как счётчик корзины в витрине ДС (ui_kits/storefront): заливка Accent strong, белые цифры */
+.ig-cart { gap: var(--space-3_5); color: var(--text-default); }
+.ig-cart__icon { position: relative; display: inline-flex; }
+.ig-cart__count {
+  position: absolute;
+  top: -10px;
+  left: 11px;                         /* кружок на правом верхнем углу иконки, сумма отодвинута на ширину кружка */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-pill);
+  background: #50a27b;                  /* 27.10, было --action-accent-strong */
+  color: var(--text-on-dark);
+  font-size: var(--font-size-micro);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  box-shadow: 0 0 0 2px var(--surface-card);
+}
+.ig-cart__sum { font-size: var(--font-size-body); font-weight: var(--weight-semibold); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ig-cart__count[hidden],
+.ig-cart__sum[hidden] { display: none; }
+.ig-proto__link { padding: 0; border: 0; background: none; font: inherit; color: inherit; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+
+/* ==========================================================================
+   ГЛАВНОЕ МЕНЮ — тёмная полоса
+   ========================================================================== */
+.ig-mainnav { position: relative; background: var(--surface-band-dark); color: var(--text-on-dark); }
+.ig-mainnav__inner {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  min-height: var(--size-field);
+}
+.ig-mainnav__list { display: flex; align-items: stretch; }
+.ig-mainnav__list--end { margin-left: auto; }
+.ig-navlink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-4);
+  border: 0;
+  background: none;
+  color: var(--text-on-dark);
+  font-family: var(--font-heading);
+  font-weight: var(--weight-semibold);
+  font-size: var(--font-size-body-sm);
+  letter-spacing: var(--tracking-loose);
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--duration-fast) ease;
+}
+.ig-navlink[aria-expanded="true"] { background: var(--wash-on-dark); }
+@media (hover: hover) {
+  .ig-navlink:hover { color: var(--text-on-dark); background: var(--wash-on-dark); }
+}
+
+/* ==========================================================================
+   ВЫПАДАЮЩИЙ КАТАЛОГ
+   ========================================================================== */
+.ig-mega {
+  position: absolute;
+  left: 0; right: 0; top: 100%;
+  z-index: var(--z-dropdown);
+  background: var(--surface-card);
+  border-top: 1px solid var(--border-subtle);
+  border-radius: 0 0 var(--radius-panel) var(--radius-panel);
+  box-shadow: var(--shadow-pop);
+  /* открытие — «шторка» сверху вниз (clip-path) с проявлением и коротким сдвигом; закрытие — обратно.
+     Поля clip-path по бокам и снизу (48 px) оставляют место для тени --shadow-pop */
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(calc(-1 * var(--space-2)));
+  clip-path: inset(0 -48px 100% -48px);
+  transition: opacity var(--duration-fast) ease, transform var(--duration-base) var(--ease-standard),
+              clip-path var(--duration-base) var(--ease-standard), visibility 0s linear var(--duration-base);
+}
+.ig-mega.is-open {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+  clip-path: inset(0 -48px -48px -48px);
+  transition: opacity var(--duration-fast) ease, transform var(--duration-base) var(--ease-standard),
+              clip-path var(--duration-base) var(--ease-standard), visibility 0s;
+}
+/* пока меню открыто, страница под ним приглушена; затемнение не ловит мышь — уход с меню закрывает его, как раньше */
+.ig-mainnav::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 100%;
+  height: 100vh;
+  z-index: calc(var(--z-dropdown) - 1);
+  background: var(--overlay-scrim);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--duration-base) var(--ease-standard), visibility 0s linear var(--duration-base);
+}
+.ig-mainnav:has(.ig-mega.is-open)::after {
+  opacity: 0.5;
+  visibility: visible;
+  transition: opacity var(--duration-base) var(--ease-standard), visibility 0s;
+}
+/* стрелка у «Каталога» поворачивается, пока меню открыто */
+.ig-navlink .ig-ic--chevron { transition: transform var(--duration-base) var(--ease-standard); }
+.ig-navlink[aria-expanded="true"] .ig-ic--chevron { transform: rotate(180deg); }
+/* колонки раздела не анимируются: при открытии меню и при переходе на другой раздел появляются сразу (решение 12.10) */
+.ig-mega__inner { padding: var(--space-5) var(--space-6) var(--space-7); }
+.ig-mega__cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding-bottom: var(--space-4);
+  margin-bottom: var(--space-5);
+  border-bottom: 1px solid var(--border-subtle);
+}
+/* вкладка категории: выбранная — заливка House, как Tab в ДС */
+.ig-mega__cat {
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-field);
+  background: none;
+  color: var(--text-default);
+  font-size: var(--font-size-body-sm);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--duration-fast) ease, color var(--duration-fast) ease;
+}
+.ig-mega__cat.is-active { background: var(--surface-inverse); color: var(--text-on-dark); }
+.ig-mega__cols { display: flex; gap: var(--space-6) var(--space-5); }
+.ig-mega__cols[hidden] { display: none !important; }
+.ig-mega__cols > div { flex: 1 1 0; min-width: 0; }
+.ig-mega__group-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-bold);
+  font-size: var(--font-size-h5);
+  letter-spacing: var(--tracking-tight);
+  color: var(--text-heading);
+}
+.ig-mega__group-title a { color: inherit; }
+.ig-mega__group + .ig-mega__group { margin-top: var(--space-5); }
+/* без пустых промежутков между пунктами: ссылка – на всю ширину колонки, расстояние между пунктами – её поля
+   (наведение не «проваливается» между пунктами, 23.10); заголовок группы – с полями 4 px сверху и снизу */
+.ig-mega__links li { margin-bottom: 0; }
+.ig-mega__links a { display: block; padding-block: calc(var(--space-2) / 2); color: var(--text-default); font-size: var(--font-size-body-sm); line-height: 1.3; }
+.ig-mega__group-title a { display: inline-block; padding-block: var(--space-1); }
+/* при наведении ссылки зеленеют; у подразделов (заголовки колонок) ещё и прорисовывается линия слева направо –
+   вдвое быстрее, чем было до 19.10 (половина --duration-base, 0,15 с). У под-подразделов (списки) линии нет */
+.ig-mega__group-title a,
+.ig-mega__links a { position: relative; transition: color var(--duration-fast) ease; }
+.ig-mega__group-title a::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 1px;          /* под текстом: верх линии там же, где был у линии 1 px */
+  height: 2px;                             /* 2 px (23.10; было 1 px) */
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform calc(var(--duration-base) / 2) var(--ease-standard);
+}
+.ig-mega__marker { display: none; }
+.ig-mega__close { display: none; }
+@media (hover: hover) {
+  .ig-mega__cat:not(.is-active):hover { background: var(--surface-subtle); color: var(--text-default); }
+  .ig-mega__group-title a:hover,
+  .ig-mega__links a:hover { color: var(--text-link); }
+  .ig-mega__group-title a:hover::after { transform: scaleX(1); }
+}
+/* под-подразделы: при наведении текст сдвигается вправо на 8 px, слева проявляется квадратик 4 px цвета ссылки (23.10).
+   Сдвигается только текст (span) – сама ссылка на месте, наведение не срывается у левого края */
+.ig-mega__links a { transition-duration: calc(var(--duration-fast) / 2); }   /* цвет – тоже вдвое быстрее (23.10) */
+.ig-mega__links a span { display: inline-block; transition: transform calc(var(--duration-fast) / 2) var(--ease-standard); }   /* вдвое быстрее (23.10) */
+.ig-mega__links a::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc(var(--space-2) / 2 + 0.65em - 2px);   /* по центру первой строки текста */
+  width: 4px; height: 4px;
+  background: currentColor;
+  opacity: 0;
+  transform: scale(0);
+  transition: opacity calc(var(--duration-fast) / 2) ease, transform calc(var(--duration-fast) / 2) var(--ease-standard);
+}
+@media (hover: hover) {
+  .ig-mega__links a:hover span { transform: translateX(8px); }
+  .ig-mega__links a:hover::before { opacity: 1; transform: scale(1); }
+}
+/* разделы — вертикальными вкладками слева */
+@media (min-width: 901px) {
+  .ig-mega--sidebar .ig-mega__inner {
+    display: grid;
+    grid-template-columns: 256px minmax(0, 1fr);   /* 27.10: было 232 – «Одноразовая продукция» полужирным переносилась */
+    gap: var(--space-6);
+    align-items: start;
+  }
+  .ig-mega--sidebar .ig-mega__cats {
+    grid-area: 1 / 1;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 2px;
+    margin: 0;
+    padding: 0 var(--space-5) 0 0;
+    border-bottom: 0;
+    border-right: 1px solid var(--border-subtle);
+    align-self: stretch;
+  }
+  .ig-mega--sidebar .ig-mega__cat { position: relative; width: 100%; text-align: left; padding: var(--space-2_5) var(--space-5) var(--space-2_5) var(--space-3); }
+  /* выбранный раздел — контур графитом 1,5 px без заливки (27.10, вариант 2 из output/2026-10-27_mega-category-highlight;
+     до того – тёмная плашка House), переезжает к наведённому пункту (позицию ставит script.js); текст полужирный,
+     справа – стрелка ›, «ведущая» в колонки раздела */
+  .ig-mega--sidebar .ig-mega__cats { position: relative; }
+  .ig-mega--sidebar .ig-mega__marker {
+    display: block;
+    position: absolute;
+    top: 0; left: 0; right: var(--space-5);
+    height: var(--marker-h, 0);
+    border-radius: var(--radius-field);
+    box-shadow: inset 0 0 0 1.5px var(--text-default);
+    transform: translateY(var(--marker-y, 0));
+    pointer-events: none;
+    transition: none;   /* 27.10: контур встаёт у наведённого раздела сразу, без переезда (до того – 0,15 с) */
+  }
+  .ig-mega--sidebar .ig-mega__cats.is-instant .ig-mega__marker { transition: none; }
+  .ig-mega--sidebar .ig-mega__cat.is-active { background: transparent; color: var(--text-default); font-weight: var(--weight-semibold); }
+  .ig-mega--sidebar .ig-mega__cat::after {
+    content: "";
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    width: 7px; height: 7px;
+    border: solid currentColor;
+    border-width: 1.5px 1.5px 0 0;
+    opacity: 0;
+    transform: translate(-4px, -50%) rotate(45deg);
+  }
+  /* стрелка проявляется со сдвигом слева, а у раздела, с которого ушёл курсор, пропадает сразу (27.10):
+     переход задан только выбранному пункту */
+  .ig-mega--sidebar .ig-mega__cat.is-active::after {
+    opacity: 1;
+    transform: translate(0, -50%) rotate(45deg);
+    transition: opacity calc(var(--duration-base) / 2) ease, transform calc(var(--duration-base) / 2) var(--ease-standard);
+  }
+  .ig-mega--sidebar .ig-mega__cat { transition: none; }   /* текст выбранного раздела – сразу, вместе с контуром (27.10) */
+  .ig-mega--sidebar .ig-mega__cols { grid-area: 1 / 2; }
+  .ig-mega--sidebar .ig-mega__links a,
+  .ig-mega--sidebar .ig-mega__group-title a { overflow-wrap: anywhere; }
+}
+
+/* ==========================================================================
+   ШАПКА СТРАНИЦЫ ПОДКАТЕГОРИИ И ГРУППЫ — тёплая полоса (--surface-promo — для hero-полос),
+   крошки (Breadcrumb) и заголовок .igro-promo в обычном регистре
+   ========================================================================== */
+.ig-hero { padding-block: var(--space-7); background: var(--surface-promo); text-align: center; }
+.ig-hero .igro-crumbs__list { justify-content: center; }
+/* зелёная ссылка на кремовом фоне — 4,4:1, ниже AA; ссылки крошек здесь тёмные, подчёркивание остаётся */
+.ig-hero .igro-crumbs__link { color: var(--text-default); }
+/* текущая страница – цвет ссылок, прозрачность 30 % (27.10): серый --text-muted терялся на тёмной шапке «Мужского ухода» */
+.ig-hero .igro-crumbs__current { color: color-mix(in srgb, var(--text-default) 70%, transparent); }
+.ig-hero__title { margin: var(--space-3) 0 0; color: var(--text-title); }   /* 26.10: заголовок подкатегории и группы – графитовый Ink #212121 (ДС --text-title), не зелёный --text-heading */
+/* фон-текстура подкатегории (адрес картинки — в --hero-tex у полосы); пока она грузится, видна тёплая полоса */
+.ig-hero--tex { background: var(--surface-promo) var(--hero-tex) center / cover no-repeat; }
+
+/* ==========================================================================
+   РАЗДЕЛЫ ЧИПАМИ (группы подкатегории) и стрелки прокрутки рядов
+   ========================================================================== */
+.ig-directions { padding-block: var(--space-2); }
+.ig-directions__wrap { position: relative; display: flex; align-items: center; }
+.ig-directions__track {
+  display: flex;
+  gap: var(--space-3);
+  width: 100%;
+  overflow-x: auto;
+  padding-block: var(--space-2);
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+.ig-directions__track::-webkit-scrollbar { display: none; }
+/* раздел — ссылка-пилюля с иконкой; текущий — как выбранная опция ДС: рамка House + кольцо */
+.ig-direction {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2_5);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background: var(--surface-card);
+  color: var(--text-default);
+  font-size: var(--font-size-body);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease, transform var(--duration-fast) ease;
+}
+.ig-direction:active { transform: scale(var(--press-scale)); }
+/* текущий раздел — заливка --ig-on (в ДС выбранная опция — рамка House с кольцом) */
+.ig-direction[aria-current="page"] { background: var(--ig-on); border-color: var(--ig-on); color: var(--text-on-dark); }
+.ig-direction__dot { flex: none; width: 48px; height: 48px; border-radius: var(--radius-pill); background: var(--surface-sunken); }
+/* чип с иконкой группы: иконка высотой 96 px крупнее самого чипа (52 px) и выходит за него сверху и снизу.
+   У файлов иконок прозрачные поля по бокам обрезаны, поэтому иконка стоит в строке чипа обычным элементом
+   и отступ от рисунка до текста у всех чипов одинаковый. Отрицательные поля сверху и снизу — чтобы иконка
+   не меняла высоту чипа. У разделов без иконок (не «Волосы») остаётся кружок */
+.ig-direction--icon {
+  --dir-icon: 96px;
+  min-height: var(--size-control-lg);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-2);
+}
+.ig-direction__icon {
+  flex: none;
+  width: auto;
+  height: var(--dir-icon);
+  margin-block: calc(var(--dir-icon) / -2);
+  pointer-events: none;
+  /* 26.10: нижняя половина иконки обрезана маской по форме чипа – по нижней границе и по скруглению левого края
+     до середины чипа по высоте; верхняя половина выступает как раньше (файл иконки не тронут).
+     Координаты – в рамке иконки: чип 52 px, иконка по центру (выступ (96 − 52) / 2 = 22 px), левый край иконки
+     на 9 px правее края чипа (поле 8 + рамка 1). Скругление – полукруг радиусом 26 с центром (−9 + 26; 22 + 26) */
+  clip-path: path("M -300 -300 H 1300 V 74 H 17 A 26 26 0 0 1 -9 48 H -300 Z");
+}
+/* ряд прокручивается по горизонтали и обрезает всё, что выходит по вертикали, — даём иконкам место сверху и снизу */
+.ig-directions:has(.ig-direction--icon) { padding-block: 0; }
+.ig-directions__track:has(.ig-direction--icon) { padding-block: var(--space-4); }
+@media (hover: hover) {
+  .ig-direction:not([aria-current="page"]):hover { border-color: var(--border-inverse); color: var(--text-default); }
+}
+
+/* стрелки рядов — квадратная кнопка 44 px с углами 8 px, как ghost IconButton, на белой подложке */
+.ig-directions__arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-md);
+  height: var(--size-control-md);
+  padding: 0;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-field);
+  background: var(--surface-card);
+  color: var(--text-default);
+  cursor: pointer;
+  transform: translateY(-50%);
+  box-shadow: 0 0 0 var(--space-2_5) var(--surface-page);
+  transition: background var(--duration-fast) ease, transform var(--duration-fast) ease;
+}
+.ig-directions__arrow:active { transform: translateY(-50%) scale(var(--press-scale-icon)); }
+.ig-directions__arrow--left { left: 0; }
+.ig-directions__arrow--right { right: 0; }
+.ig-directions__arrow[hidden] { visibility: hidden; pointer-events: none; }
+@media (hover: hover) {
+  .ig-directions__arrow:hover { background: var(--surface-sunken); }
+}
+
+/* ==========================================================================
+   ШАПКА КАТЕГОРИИ — мини-баннеры подкатегорий
+   Макет: Figma «IB — my DESIGN», узел 2574:3195 (холст в 2×). Сцена из ЛК, крошки, ряд баннеров
+   во всю ширину окна, края уходят в затемнение. Группы — чипами (.ig-direction).
+   ========================================================================== */
+.ig-cathero {
+  --cb-size: 184px;                 /* сторона баннера — макет */
+  --cb-gap: var(--space-3_5);
+  --cb-inset: var(--space-2_5);     /* отступ подписи в баннере; по нему же выровнены крошки */
+  --cb-gutter: var(--gutter-lg);    /* = боковой отступ .ig-container */
+  --cb-ring: var(--space-2);        /* запас по вертикали под рамку текущего раздела */
+  --cb-crumbs-gap: var(--space-3);  /* от крошек до баннеров */
+  --cb-pad-b: var(--space-7);       /* от баннеров до низа полосы */
+  --cb-fade: 93px;                  /* ширина затемнения — макет */
+  --cb-scene: #012220;              /* цвет затемнения — тон правой части фона (03.11; со сценой из ЛК было #0e241a) */
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-3) 0 calc(var(--cb-pad-b) - var(--cb-ring));
+  /* 03.11: фон – Figma IGRO DESIGN SYSTEM 2686:3 «hair-scene-teal-dark-a» (1920×446), до этого – сцена из ЛК hero-scene.webp */
+  background: var(--cb-scene) url("assets/hero-scene-teal-dark.webp") left top / cover no-repeat;
+  color: var(--text-on-dark);
+}
+/* крошки на тёмном: ссылки белые с подчёркиванием, текущий раздел приглушён — как Breadcrumb ДС, только на House */
+.ig-cathero__crumbs { margin: 0 0 calc(var(--cb-crumbs-gap) - var(--cb-ring)); padding-left: var(--cb-inset); }
+.ig-cathero__crumbs .igro-crumbs__list { min-height: 22px; }
+.ig-cathero__crumbs .igro-crumbs__link { color: var(--text-on-dark); }
+.ig-cathero__crumbs .igro-crumbs__sep,
+.ig-cathero__crumbs .igro-crumbs__current { color: var(--text-on-dark-muted); }
+
+/* 04.11: «Косметология» – светлый фон «3а. Свет и тень, туман #D6E9E7» (banners/category-scene/01_2026-11-03_hair-concepts,
+   assets/hair-scene-fog.jpg): тень эвкалипта по ровному полю. Шапка для светлого фона – тёмный текст, под плитками мягкая тень (как в концепции) */
+.ig-cathero[data-cat="cosmetology"] {   /* + класс ig-cathero--light (render.js CATHERO_LIGHT): шапка сайта с тёмным текстом */
+  --cb-scene: #c8dedb;              /* тон правого края картинки */
+  background: var(--cb-scene) url("assets/hero-scene-fog.webp") left top / cover no-repeat;
+  color: var(--text-default);
+}
+.ig-cathero[data-cat="cosmetology"] .ig-cathero__crumbs .igro-crumbs__link { color: var(--text-default); }
+.ig-cathero[data-cat="cosmetology"] .ig-cathero__crumbs .igro-crumbs__sep,
+.ig-cathero[data-cat="cosmetology"] .ig-cathero__crumbs .igro-crumbs__current { color: var(--text-muted); }
+.ig-cathero[data-cat="cosmetology"] .ig-banner { box-shadow: 0 6px 18px -6px rgba(40, 35, 30, .28); }
+/* лента прокручивается и режет всё за своим отступом: тень уходит на 18 px вниз, отступ 8 px – низ тени был ровным (04.11).
+   Нижний отступ ленты +16 px и столько же отрицательным полем – высота полосы прежняя */
+.ig-cathero[data-cat="cosmetology"] .ig-cathero__track { padding-bottom: calc(var(--cb-ring) + 16px); margin-bottom: -16px; }
+.ig-cathero[data-cat="cosmetology"] .ig-banner:focus-visible { outline-color: var(--text-link); }
+
+.ig-cathero__rail { position: relative; isolation: isolate; }
+/* затемнение краёв: справа — пока ряд не докручен до конца, слева — когда ряд прокручен.
+   Начинается под крошками и проявляется к верху баннеров. Градиент — из макета (в ДС градиентов нет) */
+.ig-cathero__rail::before,
+.ig-cathero__rail::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: calc(var(--cb-ring) - var(--cb-crumbs-gap));
+  bottom: calc(var(--cb-ring) - var(--cb-pad-b));
+  width: var(--cb-fade);
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 var(--cb-crumbs-gap));
+  mask-image: linear-gradient(180deg, transparent 0, #000 var(--cb-crumbs-gap));
+  transition: opacity var(--duration-base) var(--ease-standard);
+}
+.ig-cathero__rail::after { right: 0; background: linear-gradient(90deg, transparent 9.2%, var(--cb-scene) 81.2%); }
+.ig-cathero__rail::before { left: 0; background: linear-gradient(270deg, transparent 9.2%, var(--cb-scene) 81.2%); opacity: 0; }
+.ig-cathero__rail.is-scrolled::before { opacity: 1; }
+.ig-cathero__rail.is-end::after { opacity: 0; }
+.ig-cathero__track {
+  gap: var(--cb-gap);
+  padding-block: var(--cb-ring);
+  /* первый баннер стоит по краю контейнера, а ряд прокручивается до края окна */
+  padding-inline: calc(max(0px, (100% - var(--container-xl)) / 2) + var(--cb-gutter));
+  scroll-padding-inline: calc(max(0px, (100% - var(--container-xl)) / 2) + var(--cb-gutter));
+}
+.ig-cathero .ig-directions__arrow { border-color: transparent; box-shadow: var(--shadow-pop); }
+.ig-cathero .ig-directions__arrow--left { left: var(--space-3); }
+.ig-cathero .ig-directions__arrow--right { right: var(--space-3); }
+
+/* баннер — тайл с картинкой: углы --radius-panel (роль «banner, image tile» в ДС) */
+.ig-banner {
+  position: relative;
+  isolation: isolate;
+  flex: 0 0 var(--cb-size);
+  display: block;
+  width: var(--cb-size);
+  height: var(--cb-size);
+  overflow: hidden;
+  border-radius: var(--radius-panel);
+  background: var(--cb-bg, var(--surface-sunken));
+  color: var(--text-heading);
+  transition: transform var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
+}
+.ig-banner__img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform var(--duration-base) var(--ease-standard);
+}
+.ig-banner:active { transform: scale(var(--press-scale)); }
+.ig-banner:focus-visible { outline-color: var(--text-on-dark); outline-offset: 3px; }
+/* подпись — заглавными, как надзаголовок ДС: Montserrat 700, 13 px (нижний предел шкалы), --tracking-loose */
+.ig-banner__t {
+  position: absolute;
+  top: var(--cb-inset); left: var(--cb-inset); right: var(--cb-inset);
+  font-family: var(--font-heading);
+  font-weight: var(--weight-bold);
+  font-size: var(--font-size-micro);
+  line-height: var(--leading-compact);
+  letter-spacing: var(--tracking-loose);
+  text-transform: uppercase;
+}
+@media (hover: hover) {
+  .ig-banner:hover .ig-banner__img { transform: scale(1.05); }
+}
+/* фон — цвет угла картинки, виден, пока она грузится (цвета картинок, не интерфейса).
+   Подпись — IGRO Green (--text-heading): на всех светлых фонах ≥ 6:1. На тёмном баннере — белая */
+/* фон тайла = подложка баннера (квадраты «Волос» v3, Figma IGRO DESIGN SYSTEM 2674:2, 03.11; было – квадраты v5 от 26.10) */
+.ig-banner[data-banner="hair-okrashivanie"]    { --cb-bg: #f5dcce; }
+.ig-banner[data-banner="hair-blond"]           { --cb-bg: #c8f0da; }
+.ig-banner[data-banner="hair-uhod-dlya-volos"] { --cb-bg: #f5e0d2; }
+.ig-banner[data-banner="hair-terapiya"]        { --cb-bg: #d5e4fb; }
+.ig-banner[data-banner="hair-zavivka"]         { --cb-bg: #e9e0da; }
+.ig-banner[data-banner="hair-stayling"]        { --cb-bg: #98c0c8; }
+.ig-banner[data-banner="hair-nabory"]          { --cb-bg: #f7e1c0; }
+.ig-banner[data-banner="hair-muzhskoy-uhod"]   { --cb-bg: #335351; }
+.ig-banner[data-banner="hair-aksessuary"]      { --cb-bg: #acc2e5; }
+.ig-banner[data-banner="hair-instrumenty"]     { --cb-bg: #d6e9e7; }
+.ig-banner[data-banner="hair-muzhskoy-uhod"] { color: var(--text-on-dark); }
+/* 03.11: «Одноразовая продукция» – фоны квадратов – замер фона картинок (заданы были #C8F0DA, #F7E1C0, #D6E9E7, #F5E0D2, #D5E4FB, #335351) (banners/square/07_2026-11-03_dispo-palette-v) */
+.ig-banner[data-banner="dispo-odnorazovaya-odezhda"]   { --cb-bg: #c0e3d3; }
+.ig-banner[data-banner="dispo-odnorazovye-komplekty"]  { --cb-bg: #f3d7b8; }
+.ig-banner[data-banner="dispo-sredstva-dlya-zaschity"] { --cb-bg: #c7e0df; }
+.ig-banner[data-banner="dispo-prostyni-i-pokrytiya"]   { --cb-bg: #f2d7c7; }
+.ig-banner[data-banner="dispo-polotenca-i-salfetki"]   { --cb-bg: #cbdefb; }
+.ig-banner[data-banner="dispo-dispensery-i-oborudovanie-dlya-rashodnyh-materialov"] { --cb-bg: #2c504c; color: var(--text-on-dark); }
+/* 04.11: «Косметология» – Figma zI4as0EjzW7SlosfoEbPBe 2924:2759 (banners/square/08_2026-11-04_cosmetology-palette-v).
+   Подписи как в макете: #335351 на светлых, коричневая на «Защите от солнца» (решение Антона), белые на тёмных */
+.ig-banner[data-banner^="cosm-"] { color: #335351; }
+.ig-banner[data-banner="cosm-uhod-dlya-lica"]      { --cb-bg: #c8f0da; }
+.ig-banner[data-banner="cosm-zaschita-ot-solnca"]  { --cb-bg: #f7e1c0; color: #8d5831; }
+.ig-banner[data-banner="cosm-nabory"]              { --cb-bg: #acc2e5; }
+.ig-banner[data-banner="cosm-dermatokosmecevtika"] { --cb-bg: #e9e0da; }
+.ig-banner[data-banner="cosm-sredstva-dlya-apparatnoy-kosmetologii"] { --cb-bg: #98cdc8; }
+.ig-banner[data-banner="cosm-uhod-dlya-tela"]      { --cb-bg: #644841; color: var(--text-on-dark); }
+.ig-banner[data-banner="cosm-muzhskoy-uhod"]       { --cb-bg: #3e5a4b; color: var(--text-on-dark); }
+.ig-banner[data-banner="cosm-aksessuary"]          { --cb-bg: #d5e4fb; }
+.ig-banner[data-banner="cosm-instrumenty"]         { --cb-bg: #cce8eb; }
+/* слово не влезает в строку: перенос внутри слова, как в макете («ДЕРМАТОКОСМЕЦЕ / ВТИКА») */
+.ig-banner[data-banner="cosm-dermatokosmecevtika"] .ig-banner__t { overflow-wrap: anywhere; }
+
+/* ==========================================================================
+   ПАНЕЛЬ ИНСТРУМЕНТОВ: «Фильтры», чипы брендов (Tag), счётчик, сортировка (Menu)
+   ========================================================================== */
+.ig-toolbar { padding-block: var(--space-4); }
+.ig-toolbar__row { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+.ig-toolbar__left { display: flex; align-items: center; gap: var(--space-2_5); flex-wrap: wrap; flex: 1; min-width: 0; }
+.ig-toolbar__left > .igro-tag[hidden] { display: none; }   /* чипы брендов, не поместившиеся в строку (26.10) */
+.ig-toolbar__right { display: flex; align-items: center; gap: var(--space-4); margin-left: auto; white-space: nowrap; }
+
+/* «Фильтры» — Button sm; ширина под «Фильтры · 99», без счётчика содержимое по центру */
+.ig-filters-btn { min-width: 132px; }
+.ig-btn__num:empty { display: none; }   /* у «Фильтров» число всегда есть – см. ig-btn__num.is-empty ниже */
+
+/* чипы — Tag ДС высотой малого контрола, чтобы строка стояла ровно с кнопкой «Фильтры» */
+.ig-toolbar .igro-tag,
+.ig-qf .igro-tag { height: var(--size-control-sm); padding-block: 0; margin: 0; }
+.igro-tag--interactive:active { transform: scale(var(--press-scale)); }
+.igro-tag .ig-ic { color: currentColor; }
+/* выбранный бренд в быстрых фильтрах — заливка цвета полосы меню (House, --surface-inverse), белый текст;
+   у Tag ДС выбранный — белый с тёмной рамкой (решение пользователя 12.10) */
+.ig-toolbar .igro-tag[aria-pressed="true"],
+.ig-toolbar .igro-tag--selected { background: var(--surface-inverse); border-color: var(--surface-inverse); color: var(--text-on-dark); }
+/* снимаемый чип (бренд или линия, выбранные в карточке): крестик на тёмной заливке */
+.ig-toolbar .igro-tag__remove { color: var(--text-on-dark-muted); transition: color var(--duration-fast) ease; }
+@media (hover: hover) {
+  .ig-toolbar .igro-tag__remove:hover { color: var(--text-on-dark); }
+}
+
+/* медаль на чипе эксклюзивного бренда */
+.ig-tag-hit { position: relative; }
+.ig-medal {
+  position: absolute; top: -7px; right: -7px;
+  display: block; width: 18px; height: 18px;
+  color: var(--action-brand);
+  pointer-events: none;
+}
+.ig-medal svg { display: block; width: 100%; height: 100%; }
+.ig-medal__star { fill: var(--text-on-dark); }
+
+.ig-count { font-size: var(--font-size-body-sm); color: var(--text-muted); white-space: nowrap; }
+
+/* сортировка: текстовая кнопка, список — Menu ДС (текущий пункт отмечен aria-current) */
+.ig-sortwrap { position: relative; }
+.ig-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: var(--size-control-sm);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-field);
+  background: none;
+  color: var(--text-default);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: background var(--duration-fast) ease;
+}
+.ig-sort[aria-expanded="true"] .ig-ic { transform: rotate(180deg); }
+.ig-sortmenu { position: absolute; top: calc(100% + var(--space-2)); right: 0; z-index: var(--z-dropdown); }
+@media (hover: hover) {
+  .ig-sort:hover { background: var(--surface-sunken); }
+}
+
+/* ==========================================================================
+   БЫСТРЫЕ ФИЛЬТРЫ: технология / задача (Tag) и тип продукта (текстом)
+   ========================================================================== */
+.ig-qf { display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-3); }
+.ig-qf__row { display: grid; grid-template-columns: var(--qf-indent, 140px) 1fr; align-items: start; column-gap: 0; row-gap: var(--space-2); }
+/* подпись — надзаголовок: заглавные с --tracking-loose */
+/* подпись строки выровнена вправо и кончается по правому краю кнопки «Фильтры»; +0.1em — хвост разрядки после двоеточия */
+.ig-qf__label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--qf-label-w, 132px);          /* = ширина кнопки «Фильтры»: подпись по её центру (23.10) */
+  text-align: center;
+  min-height: var(--size-control-sm);
+  font-size: var(--font-size-micro);
+  font-weight: var(--weight-semibold);
+  line-height: 1.4;
+  letter-spacing: var(--tracking-loose);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.ig-qf__chips { display: flex; flex-wrap: wrap; gap: var(--space-2); min-width: 0; }
+.ig-qf__row--text { align-items: baseline; }
+.ig-qf__row--text .ig-qf__label { min-height: 0; }
+.ig-typelist { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); min-width: 0; font-size: var(--font-size-body-sm); line-height: var(--leading-normal); }
+.ig-tlink {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--text-default);
+  text-decoration: underline;
+  text-decoration-color: var(--border-default);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  transition: color var(--duration-fast) ease, text-decoration-color var(--duration-fast) ease;
+}
+.ig-tlink[aria-pressed="true"] { color: var(--text-heading); font-weight: var(--weight-semibold); text-decoration-color: currentColor; text-decoration-thickness: 2px; }
+.ig-typelist__only { color: var(--text-default); }
+/* «ещё (N)» в конце второй строки типов продукта — ссылка-действие: открывает панель на группе «Тип продукта» */
+.ig-tlink--more { color: var(--text-link); font-weight: var(--weight-semibold); text-decoration-color: currentColor; }
+@media (hover: hover) {
+  .ig-tlink:hover { color: var(--text-link); text-decoration-color: currentColor; }
+}
+
+/* ==========================================================================
+   СЕТКА ТОВАРОВ И КАРТОЧКА — новый дизайн, эксперимент design-lab (21.10.2026)
+   Макет: Figma «IB — my DESIGN», узел 2740:3615 (карточка 226 × 472, сетка с промежутком 42 px).
+   · обычная карточка — без рамки и подложки; фото 1 : 1, углы 8 px, поверх фото затемнение 5 %
+     (rgba(72, 80, 85, .05)); справа сверху «В избранное»;
+   · продукт с вариантами — «стопка»: белая плашка с тенью и две такие же за ней (сдвиг 6/−4 и 12/−8 px),
+     поля 8/9 px, слева сверху плашка «N оттенков / вариантов»;
+   · текст по центру: бренд (всегда на одном месте), под ним линия, название, цена;
+   · цена: левая часть (цена и «Розничная цена») выровнена вправо, правая («Узнать проф. цену») — влево;
+   · кнопки — линейные белые с зелёной рамкой, при наведении — тёмные (House);
+   · «В корзину» → 1 шт. сразу в корзине и уведомление; кнопка делится на счётчик и квадратную кнопку
+     корзины: + и − меняют число, в корзину оно уходит по кнопке корзины; «−» на единице сворачивает обратно;
+   · нет в наличии — плашка и тёмная квадратная кнопка «Сообщить о поступлении» (окно с почтой).
+   ========================================================================== */
+/* от строки «Тип продукта» до карточек – втрое больше прежних 24 px (поле панели 24 + 48 сверху, просьба 21.10);
+   поле добавлено сетке, а не панели фильтров, чтобы закреплённая под шапкой панель не стала выше */
+.ig-content { padding-top: calc(2 * var(--space-4)); padding-bottom: var(--space-9); }
+.ig-grid { display: grid; grid-template-columns: repeat(6, 1fr); column-gap: 42px; row-gap: 38px; isolation: isolate; } /* слои стопки (z-index: −1) – над соседними блоками, под своей карточкой */
+.ig-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-bottom: var(--space-2);
+  text-align: center;
+}
+/* стопка: плашка выходит за колонку на свои поля, поэтому фото и текст стоят вровень с соседями */
+.ig-card--stack {
+  margin: calc(-1 * var(--space-2)) -9px 0;
+  padding: var(--space-2) 9px var(--space-2);
+  border-radius: var(--radius-panel);
+  background: var(--surface-card);
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.15);   /* 23.10: размытие +2, сдвиг вниз и вправо +1 */
+}
+/* слои под карточкой – по макету (узлы 2740:3618, 2740:3616): фон #F6F6F6, та же тень,
+   средний сдвинут на 6/4 px (вправо и вниз, 23.10) с углами 10 px, задний – на 12/8 px с углами 12 px */
+.ig-card--stack::before,
+.ig-card--stack::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--surface-card);        /* белые – выделяются на сером фоне (23.10; в макете #F6F6F6) */
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.15);   /* 23.10: размытие +2, сдвиг вниз и вправо +1 */
+  pointer-events: none;
+}
+/* порядок рисования: ::before – задний слой, ::after – средний (ложится поверх заднего) */
+/* 23.10: сдвиг каждого следующего слоя на 1 px меньше (5/4 и 10/8 px); скругление растёт на величину сдвига вниз –
+   углы концентрические: карточка 12, средний 16, задний 20 px */
+/* 23.10: заднего (третьего) слоя нет – под карточкой один слой */
+.ig-card--stack::before { content: none; }
+.ig-card--stack::after { transform: translate(5px, 4px); border-radius: calc(var(--radius-panel) + 4px); }
+.ig-card__media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-panel);
+  background: var(--surface-card);
+  cursor: pointer;
+}
+/* затемнение 5 % поверх фото — у обычных карточек (у стопки фото чистое) */
+.ig-card:not(.ig-card--stack) .ig-card__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  /* круговой градиент (23.10, вариант 2): в центре белый – снимок как есть, к краям плашки равномерно переходит
+     в цвет страницы. С «умножением» белый фон снимка в центре остаётся белым – как подсветка под товаром, у краёв
+     становится ровно цветом страницы, без перепада. closest-side: цвет страницы – уже на серединах сторон, углы тоже */
+  /* вариант 3 (23.10): белый круг до половины радиуса, переход к цвету страницы – во второй половине */
+  background: radial-gradient(closest-side, #fff 50%, var(--surface-page) 100%);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+/* для сравнения: ?shade=soft – вариант 2, переход от самого центра; ?shade=flat – ровное умножение на цвет страницы */
+.ig-shade-soft .ig-card:not(.ig-card--stack) .ig-card__media::after { background: radial-gradient(closest-side, #fff 0%, var(--surface-page) 100%); }
+.ig-shade-flat .ig-card:not(.ig-card--stack) .ig-card__media::after { background: var(--surface-page); }
+.ig-card__media:not(.ig-card__media--img) { background: var(--surface-sunken); }
+.ig-card__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; transition: transform var(--duration-base) var(--ease-standard); }
+
+/* «В избранное»: 34 px в правом верхнем углу; наведение — сердце чуть больше, нажатие — сердце залито */
+.ig-card__fav {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-panel);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
+}
+.ig-card__fav svg { width: 18px; height: 18px; transition: transform var(--duration-fast) var(--ease-standard), fill var(--duration-fast) ease, color var(--duration-fast) ease; }
+.ig-card__fav[aria-pressed="true"] { color: var(--action-cta); }   /* залитое сердце — зелёное (Uplift), как кнопки */
+.ig-card__fav[aria-pressed="true"] svg { fill: currentColor; }
+.ig-card__fav:active svg { transform: scale(0.9); }
+
+/* плашка «109 оттенков» у стопки — IGRO Mint, Source Sans 13 bold заглавными */
+/* плашка «N вариантов» – по центру на верхней границе карточки: треть над рамкой, две трети внутри (26.10) */
+.ig-card__badge {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  padding: 5px 13px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);      /* 26.10: нейтральная Ceramic #EDEBE9, как «нет в наличии» (было зелёная Mint) */
+  color: var(--text-default);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-micro);
+  font-weight: var(--weight-bold);
+  line-height: 13px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* бренд — всегда на одном месте: 16 px под фото */
+.ig-card__brand,
+.ig-card__line { display: block; max-width: 100%; margin: 0 auto; padding: 0; border: 0; background: none; font-family: var(--font-ui); font-size: var(--font-size-micro); line-height: 18.2px; letter-spacing: -0.13px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color var(--duration-fast) ease; }
+.ig-card__brand { color: var(--text-muted); }
+/* строка «бренд · линия» – по центру, 17 px под фото (23.10, как было в v6): точка – часть линии;
+   не помещаются вместе – линия на новой строке, без точки (is-wrapped ставит render.js) */
+.ig-card__brandrow { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; margin-top: 17px; min-width: 0; }
+.ig-card__brandrow .ig-card__brand,
+.ig-card__brandrow .ig-card__line { margin: 0; min-width: 0; }
+.ig-card__brandrow .ig-card__line::before { content: "·"; display: inline-block; padding: 0 6px; color: var(--text-muted); text-decoration: none; }
+.ig-card__brandrow.is-wrapped .ig-card__line { flex-basis: 100%; }
+.ig-card__brandrow.is-wrapped .ig-card__line::before { content: none; }
+/* линия — зелёная, подчёркнута пунктиром; есть не у всех товаров, поэтому название и цена смещаются под неё */
+.ig-card__line { color: var(--text-link); text-decoration: underline dotted; text-underline-offset: 2px; }
+/* название — Montserrat 600 14/18,2 (23.10; было 16/20,8 – под 6 карточек в ряд), по центру, до трёх строк */
+.ig-card__name {
+  margin-top: 9px;
+  padding-inline: 4px;
+  font-family: var(--font-heading);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--weight-semibold);
+  line-height: 18.2px;
+  letter-spacing: -0.16px;
+  color: var(--text-default);
+  overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ig-card__brandrow.is-wrapped + .ig-card__name { margin-top: 6px; }   /* под линией на своей строке – 6 px, как в макете */
+.ig-card__link { color: inherit; text-decoration: none; text-underline-offset: 3px; transition: color var(--duration-fast) ease; }
+/* вариант товара (оттенок, объём) — только в режиме «по артикулам» */
+.ig-card__desc { margin-top: var(--space-1); padding-inline: 10px; font-size: var(--font-size-micro); line-height: 1.3; color: var(--text-muted); }
+.ig-card__desc-link { color: inherit; text-decoration: none; text-underline-offset: 2px; }
+
+/* цена: две половины — левая выровнена вправо, правая влево, промежуток 21 px */
+/* цена прижата к кнопке: от «Розничной цены» до кнопки всегда 31 px (макет 2740:3615, 391 → 422); свободное место –
+   между названием и ценой, от названия не меньше 15 px (замечание 21.10: цена «гуляла» по высоте) */
+.ig-card__price { display: flex; justify-content: center; align-items: flex-start; gap: 21px; margin-top: auto; padding-top: 15px; white-space: nowrap; }
+.ig-card__price-l { display: flex; flex-direction: column; align-items: flex-end; gap: 3.7px; text-align: right; }
+.ig-card__price-v { font-family: var(--font-heading); font-size: 20px; font-weight: var(--weight-bold); line-height: 20px; letter-spacing: -0.16px; color: var(--text-default); font-variant-numeric: tabular-nums; }
+.ig-card__price-n { font-family: var(--font-ui); font-size: var(--font-size-micro); line-height: 18.2px; letter-spacing: -0.16px; color: var(--text-muted); }
+.ig-card__pro {
+  margin-top: 2.7px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-ui);
+  font-size: var(--font-size-micro);
+  font-weight: var(--weight-semibold);
+  line-height: 15.6px;
+  letter-spacing: -0.13px;
+  color: var(--text-link);
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  transition: color var(--duration-fast) ease;
+}
+
+/* действия прижаты к низу карточки */
+.ig-card__controls { padding-top: 31px; }
+/* высота кнопок карточки – «В корзину», «Выбрать», квадратные, счётчик, «нет в наличии»: 34 px (ДС sm) вместо 44 px (23.10) */
+.ig-card { --card-ctl: var(--size-control-sm); }
+/* кнопка — линейная белая: рамка и текст Uplift, 44 px, углы 4 px; при наведении — тёмная (House) */
+.ig-card__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: var(--card-ctl);
+  padding: 0 var(--space-3);
+  border: 1px solid transparent;          /* 23.10: «Выбрать» – только текст, рамка проявляется при наведении */
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: #335351;                         /* 27.10: текст и стрелка – #335351, как «В корзину» (26.10–27.10 – House #1A3328) */
+  font-family: var(--font-ui);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--weight-semibold);
+  line-height: 16.8px;
+  letter-spacing: -0.14px;
+  cursor: pointer;
+  transition: background var(--duration-fast) ease, border-color var(--duration-fast) ease, color var(--duration-fast) ease, transform var(--duration-fast) ease;
+}
+.ig-card__btn svg { width: 18px; height: 18px; flex: none; }
+.ig-card__btn:active { transform: scale(var(--press-scale)); }
+/* разделённый блок: слева счётчик или «нет в наличии», справа квадратная тёмная кнопка 44 px, промежуток 8 px */
+.ig-card__split { display: flex; gap: var(--space-2); }
+.ig-card__sq {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--card-ctl);
+  height: var(--card-ctl);
+  padding: 0;
+  border: 1px solid var(--surface-inverse);
+  border-radius: var(--radius-control);
+  background: var(--surface-inverse);
+  color: var(--text-on-dark);
+  cursor: pointer;
+  transition: background var(--duration-fast) ease, border-color var(--duration-fast) ease, color var(--duration-fast) ease, transform var(--duration-fast) ease;
+}
+.ig-card__sq svg { width: 18px; height: 18px; }
+.ig-card__sq--bell svg { width: 20px; height: 20px; }   /* под кнопку 34 px (23.10; было 20 и 24) */
+/* колокольчик – линейный, как «В корзину»: рамка и иконка House, заливка – только при наведении (26.10) */
+.ig-card__sq--bell { background: transparent; color: var(--surface-inverse); }
+.ig-card__sq:active { transform: scale(var(--press-scale-icon)); }
+/* счётчик: рамка Silver, кнопки − и + 44 px с зелёной рамкой, число можно ввести вручную */
+.ig-card__qty {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  height: var(--card-ctl);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-control);
+}
+.ig-card__qty-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--card-ctl);
+  margin: -1px;
+  padding: 0;
+  border: 1px solid var(--action-cta);
+  border-radius: var(--radius-control);
+  background: var(--surface-card);
+  color: var(--text-default);
+  cursor: pointer;
+  transition: background var(--duration-fast) ease, color var(--duration-fast) ease;
+}
+.ig-card__qty-btn svg { width: 18px; height: 18px; }
+.ig-card__qty-in {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  font-family: var(--font-ui);
+  font-size: var(--font-size-body);
+  font-weight: var(--weight-bold);
+  line-height: 1.2;
+  letter-spacing: -0.16px;
+  text-align: center;
+  color: var(--text-default);
+  font-variant-numeric: tabular-nums;
+}
+.ig-card__qty:has(.ig-card__qty-in:focus) { border-color: var(--border-focus); background: var(--surface-card); }   /* только при вводе числа, не при − и +: зелёная рамка и белый фон (23.10) */
+/* нет в наличии — плашка Error tint, крестик красный 16 px, текст приглушённый Source Sans 14 semibold (23.10; было 16 и крестик 20 – под 6 карточек в ряд) */
+.ig-card__nostock {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--card-ctl);
+  border-radius: var(--radius-control);
+  background: var(--surface-sunken);      /* 26.10: нейтральная Ceramic #EDEBE9, мало отличается от фона (было Error tint) */
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.ig-card__nostock svg { width: 16px; height: 16px; flex: none; color: var(--status-error); }
+
+@media (hover: hover) {
+  /* увеличение фото – только у товара; у продукта (стопки) фото не реагирует – выделяется вся карточка */
+  .ig-card:not(.ig-card--stack) .ig-card__media:hover .ig-card__img { transform: scale(1.06); }
+  .ig-card--stack { cursor: pointer; transition: box-shadow var(--duration-fast) ease; }
+  .ig-card--stack:hover { box-shadow: 0 0 0 2px #335351, 1px 2px 4px rgba(0, 0, 0, 0.15); }   /* обводка – #335351 (27.10; было Uplift) */
+  /* 23.10: без перекраски в зелёный – только подчёркивание; у продукта (стопки) названия не подчёркиваются */
+  .ig-card:not(.ig-card--stack) .ig-card__link:hover { text-decoration: underline; }
+  /* подпись – часть названия (27.10): наведение на название или на подпись подчёркивает обе */
+  .ig-card:not(.ig-card--stack):has(.ig-card__link:hover, .ig-card__desc-link:hover) :is(.ig-card__link, .ig-card__desc-link) { text-decoration: underline; }
+  .ig-card__brand:hover { color: var(--text-link); text-decoration: underline; text-underline-offset: 2px; }
+  .ig-card__line:hover { text-decoration-style: solid; }
+  .ig-card__pro:hover { color: var(--action-cta); }
+  .ig-card__fav:hover svg { transform: scale(1.15); }
+  /* при наведении под сердцем – белая плашка 34 px с тонкой тенью (как плашка «box» в макете 2740:3615) (23.10) */
+  .ig-card__fav:hover { background: var(--surface-card); box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.24), 0 0 0.25px rgba(0, 0, 0, 0.14); }
+  .ig-card__fav:hover { color: var(--text-default); }
+  .ig-card__fav[aria-pressed="true"]:hover { color: var(--action-cta); }
+  /* 23.10: рамка «Выбрать» проявляется при наведении на всю карточку продукта – кнопка отдельно не подсвечивается */
+  .ig-card--stack:hover .ig-card__btn { border-color: #335351; }   /* рамка – #335351, как обводка карточки (27.10; было House) */
+  .ig-card__sq:hover { background: var(--action-dark-hover); border-color: var(--action-dark-hover); }
+  .ig-card__sq--bell:hover { background: var(--surface-inverse); border-color: var(--surface-inverse); color: var(--text-on-dark); }
+  .ig-card__qty-btn:hover { background: var(--surface-inverse); border-color: var(--surface-inverse); color: var(--text-on-dark); }
+}
+
+/* блок покупки: кнопка «В корзину» превращается в квадратную тёмную кнопку справа, слева проявляется счётчик.
+   Раскрытие: кнопка сжимается (0,21 с) и темнеет, надпись гаснет и складывается; счётчик выезжает с задержкой 0,07 с.
+   Сворачивание — наоборот: счётчик гаснет сразу, кнопка разворачивается с задержкой 0,056 с */
+/* на 30 % быстрее токенов ДС (просьба 21.10): 0,21 и 0,14 с; при «уменьшить движение» токены гасят и их */
+/* 27.10: «В корзину» – сразу залитая #335351 (цвет плашки меню), при наведении – #3C8883 (цвет верхней плашки и пунктов
+   меню); было – контур House #1A3328, заливка только при наведении */
+.ig-card__buy { --buy-bg: #335351; --buy-bg-hover: #3c8883; --buy-base: calc(var(--duration-base) * 0.7); --buy-fast: calc(var(--duration-fast) * 0.7); position: relative; height: var(--card-ctl); }
+.ig-card__buybtn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 1px solid var(--buy-bg);
+  border-radius: var(--radius-control);
+  background: var(--buy-bg);
+  color: var(--text-on-dark);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--weight-semibold);
+  line-height: 16.8px;
+  letter-spacing: -0.14px;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    width var(--buy-base) var(--ease-standard) 0.056s,
+    background-color var(--buy-base) ease 0.056s,
+    border-color var(--buy-base) ease 0.056s,
+    color var(--buy-base) ease 0.056s,
+    transform var(--buy-fast) ease;
+}
+.ig-card__buyicon { display: inline-flex; flex: none; }
+.ig-card__buyicon svg { width: 18px; height: 18px; transition: width var(--buy-base) var(--ease-standard), height var(--buy-base) var(--ease-standard); }
+.ig-card__buylabel {
+  display: inline-block;
+  max-width: 120px;
+  margin-left: 6px;
+  overflow: hidden;
+  opacity: 1;
+  transition: max-width var(--buy-base) var(--ease-standard) 0.056s, margin var(--buy-base) var(--ease-standard) 0.056s, opacity var(--buy-fast) ease calc(0.056s + var(--buy-base) * 0.6);   /* надпись проступает, когда кнопка уже светлая */
+}
+.ig-card__buy .ig-card__qty {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: calc(var(--card-ctl) + var(--space-2));
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(16px) scale(0.96);
+  transform-origin: right center;
+  transition: opacity var(--buy-fast) ease, transform var(--buy-fast) var(--ease-standard), visibility 0s linear var(--buy-fast);
+}
+/* раскрыт */
+.ig-card__buy.is-open .ig-card__buybtn {
+  width: var(--card-ctl);
+  border-color: var(--buy-bg);
+  background: var(--buy-bg);
+  color: var(--text-on-dark);
+  transition:
+    width var(--buy-base) var(--ease-standard),
+    background-color var(--buy-base) ease,
+    border-color var(--buy-base) ease,
+    color var(--buy-fast) ease,
+    transform var(--buy-fast) ease;
+}
+.ig-card__buy.is-open .ig-card__buyicon svg { width: 20px; height: 20px; }
+.ig-card__buy.is-open .ig-card__buylabel {
+  max-width: 0;
+  margin-left: 0;
+  opacity: 0;
+  transition: max-width var(--buy-base) var(--ease-standard), margin var(--buy-base) var(--ease-standard), opacity 0.07s ease;
+}
+.ig-card__buy.is-open .ig-card__qty {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity var(--buy-base) ease 0.07s, transform var(--buy-base) var(--ease-standard) 0.07s, visibility 0s;
+}
+.ig-card__buybtn:active { transform: scale(var(--press-scale)); }
+@media (hover: hover) {
+  .ig-card__buybtn:hover,
+  .ig-card__buy.is-open .ig-card__buybtn:hover { background: var(--buy-bg-hover); border-color: var(--buy-bg-hover); color: var(--text-on-dark); }
+}
+
+/* окно «Сообщить о поступлении» */
+.ig-notify .igro-dialog { max-width: 440px; }
+.ig-notify__product { margin: 0 0 var(--space-3); color: var(--text-muted); font-size: var(--font-size-body-sm); }
+.ig-notify__foot { display: flex; gap: var(--space-2_5); margin-top: var(--space-4); }
+.ig-notify__foot .igro-btn { flex: 1; }
+
+/* ==========================================================================
+   ПАГИНАЦИЯ (Pagination ДС) И ПУСТАЯ ВЫДАЧА (EmptyState ДС)
+   ========================================================================== */
+.ig-pager { display: flex; justify-content: center; flex-wrap: wrap; margin-top: var(--space-6); }
+.igro-pagination__cell:active:not(:disabled) { transform: scale(var(--press-scale)); }
+/* 27.10: текущая страница – залита #335351 (цвет плашки меню и «В корзину»), рамка при наведении – тоже #335351
+   (в ДС – House --surface-inverse / --border-inverse) */
+.ig-pager .igro-pagination__page[aria-current="page"] { background: #335351; border-color: #335351; }
+@media (hover: hover) {
+  .igro-pagination__cell:not(:disabled):not([aria-current="page"]):hover { border-color: #335351; }
+}
+.ig-empty--block { padding: var(--space-9) var(--space-4); background: var(--surface-card); border-radius: var(--radius-plate); box-shadow: var(--shadow-card); }
+.ig-empty--block .igro-empty__text { max-width: 46ch; }
+
+/* ==========================================================================
+   ПАНЕЛЬ «ФИЛЬТРЫ» — боковая панель поверх страницы (--z-overlay, House-затемнение, углы панели 12 px)
+   Группы — Accordion ДС, значения — Checkbox ДС, заглушки 1С — Switch ДС
+   ========================================================================== */
+.ig-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  background: var(--overlay-scrim);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--duration-base) var(--ease-standard), visibility var(--duration-base);
+}
+.ig-scrim.is-open { opacity: 1; visibility: visible; }
+.ig-drawer {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: var(--z-overlay);
+  display: flex;
+  flex-direction: column;
+  width: 420px;
+  max-width: 92vw;
+  overflow: hidden;
+  background: var(--surface-page);
+  border-radius: 0 var(--radius-panel) var(--radius-panel) 0;
+  box-shadow: var(--shadow-pop);
+  transform: translateX(-100%);
+  /* закрытая панель скрыта целиком: её кнопки не попадают в порядок табуляции, тень не выходит на страницу */
+  visibility: hidden;
+  transition: transform var(--duration-base) var(--ease-standard), visibility 0s linear var(--duration-base);
+}
+.ig-drawer.is-open { transform: translateX(0); visibility: visible; transition: transform var(--duration-base) var(--ease-standard), visibility 0s; }
+.ig-drawer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-3) var(--space-4) var(--space-3_5);   /* заголовок — по левому краю названий групп */
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.ig-drawer__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;                         /* группы фильтров — во всю ширину панели */
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-default) transparent;
+}
+.ig-drawer__foot {
+  display: flex;
+  gap: var(--space-2_5);
+  padding: var(--space-4) var(--space-3_5);
+  background: var(--surface-card);
+  border-top: 1px solid var(--border-subtle);
+}
+/* как подвал Dialog: основная кнопка flex 3, второстепенная flex 1 */
+/* 27.10: в панели фильтров галочки, «Показать N товаров» и контур с текстом «Сбросить» – #335351 (цвет плашки меню
+   и «В корзину»), «Показать» при наведении – #3C8883; токены ДС переопределены только внутри панели */
+.ig-drawer {
+  --action-accent: #335351;
+  --action-cta: #335351;
+  --action-cta-hover: #3c8883;
+  --wash-cta: rgba(51, 83, 81, 0.08);
+  --shadow-cta-hover: 0 4px 8px 0 rgba(51, 83, 81, 0.3);
+}
+.ig-drawer__foot [data-apply] { flex: 3; padding-inline: var(--space-3); }
+.ig-drawer__foot [data-reset] { flex: 1; padding-inline: var(--space-3); }
+
+/* группы фильтров во всю ширину панели, без полей по краям: плашки Accordion без скруглений и теней,
+   вместо зазоров 2 px между ними — тонкая линия (место под полосу прокрутки справа тоже белое) */
+.ig-facets { background: var(--surface-card); }
+.ig-facets .igro-accordion { gap: 0; }
+.ig-facets .igro-accordion__item,
+.ig-facets .ig-soon { border-radius: 0; box-shadow: none; border-bottom: 1px solid var(--border-subtle); }
+.ig-facets .ig-soon { margin-top: 0; }
+/* выбранные значения в свёрнутой группе — в одну строку */
+.ig-facets .igro-accordion__value { max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ig-facets .igro-accordion__panel { display: flex; flex-direction: column; }
+.ig-facets .igro-accordion__panel[hidden] { display: none; }
+.ig-check { display: flex; width: 100%; padding-block: var(--space-2); }
+.ig-check .igro-checkbox__text { flex: 1; min-width: 0; }
+.ig-check__count { flex: none; font-size: var(--font-size-body-sm); color: var(--text-muted); }
+.ig-morelink {
+  align-self: flex-start;
+  margin-top: var(--space-2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-link);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--weight-semibold);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+/* наличие и новинки — данные придут из 1С, переключатели выключены */
+.ig-soon {
+  margin-top: 2px;
+  padding: var(--space-2) var(--space-3_5) var(--space-3_5);
+  background: var(--surface-card);
+  border-radius: var(--radius-plate);
+  box-shadow: var(--shadow-card);
+}
+.ig-frow { display: flex; justify-content: space-between; width: 100%; padding-block: var(--space-2_5); }
+.ig-soon__note { margin: var(--space-2) 0 0; font-size: var(--font-size-micro); line-height: 1.4; color: var(--text-muted); }
+
+/* ==========================================================================
+   ПОДВАЛ И СЛУЖЕБНАЯ СТРОКА ПРОТОТИПА
+   ========================================================================== */
+.ig-footer { margin-top: var(--space-9); background: #335351; color: var(--text-on-dark-muted); }   /* 04.11, Антон: как плашка меню (--mast-menu); было --surface-band-dark #1A3328 */
+.ig-footer__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding-block: var(--space-5);
+  font-size: var(--font-size-body-sm);
+}
+.ig-footer a { color: var(--text-on-dark-muted); }
+.ig-footer__nav { display: flex; gap: var(--space-5); flex-wrap: wrap; }
+.ig-proto {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  padding-block: var(--space-2_5);
+  border-top: 1px solid var(--wash-on-dark);
+  font-size: var(--font-size-micro);
+  color: var(--text-on-dark-muted);
+}
+.ig-proto a { text-decoration: underline; text-underline-offset: 2px; }
+.ig-proto b { color: var(--text-on-dark); font-weight: var(--weight-semibold); }
+@media (hover: hover) {
+  .ig-footer a:hover { color: var(--text-on-dark); }
+}
+
+/* ==========================================================================
+   АДАПТИВ — планшет (до 1280) и телефон (до 768); промежуточные точки — под содержимое
+   ========================================================================== */
+/* 6 карточек в ряд (23.10): на узком десктопе (1280–1439) промежуток между колонками 32 px и половины цены ближе –
+   колонка ~173 px, цена «1 999 ₽ | Узнать проф. цену» помещается в ширину фото */
+@media (min-width: 1280px) and (max-width: 1439px) {
+  .ig-grid { column-gap: 32px; }
+  .ig-card__price { gap: 12px; }
+}
+@media (max-width: 1279px) {
+  .ig-container { padding-inline: var(--gutter-md); }
+  .ig-cathero { --cb-gutter: var(--gutter-md); }
+  .ig-grid { grid-template-columns: repeat(4, 1fr); }
+  .ig-header__inner { gap: var(--space-4); }
+  .ig-action__label { display: none; }
+  /* полное меню — от 1280 px (--breakpoint-lg); уже пункты плотнее, а если всё равно не помещаются — строку можно прокрутить */
+  .ig-navlink { padding: 0 var(--space-3); }
+  .ig-mainnav__inner { overflow-x: auto; scrollbar-width: none; }
+  .ig-mainnav__inner::-webkit-scrollbar { display: none; }
+}
+@media (max-width: 1023px) {
+  .ig-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 900px) {
+  .ig-qf__row,
+  .ig-qf__row--text { grid-template-columns: 1fr; align-items: start; gap: var(--space-2); }
+  .ig-qf__label { min-height: 0; width: auto; justify-content: flex-start; text-align: left; }
+  .ig-mega__cols { flex-wrap: wrap; }
+  .ig-mega__cols > div { flex: 1 1 40%; }
+}
+@media (max-width: 767px) {
+  .ig-container { padding-inline: var(--gutter-sm); }
+  .ig-topbar__contacts { display: none; }
+  .ig-topbar__promo { letter-spacing: var(--tracking-normal); }
+
+  .ig-header__inner { flex-wrap: wrap; gap: var(--space-3); padding-block: var(--space-3); }
+  .ig-logo { order: 1; gap: var(--space-2); }
+  .ig-logo__svg { width: 44px; }
+  .ig-logo__word { font-size: var(--font-size-micro); }
+  .ig-logo__tagline { gap: var(--space-1); }
+  .ig-logo__motto,
+  .ig-logo__years { font-size: var(--font-size-micro); }
+  .ig-actions { order: 2; margin-left: auto; gap: 0; }
+  .ig-cart__sum { display: none; }
+  .ig-search { order: 3; flex-basis: 100%; }
+
+  .ig-mainnav__inner { overflow-x: auto; scrollbar-width: none; }
+  .ig-mainnav__inner::-webkit-scrollbar { display: none; }
+  .ig-navlink { padding: 0 var(--space-3); }
+
+  /* выпадающий каталог — во весь экран, колонки столбцом, своя кнопка закрытия */
+  .ig-mega { position: fixed; inset: 0; z-index: var(--z-overlay); border-radius: 0; overflow-y: auto; }
+  .ig-mainnav::after { display: none; }
+  .ig-mega__inner { position: relative; }
+  .ig-mega__cols { flex-direction: column; flex-wrap: nowrap; gap: var(--space-4); }
+  .ig-mega__cols > div { flex: 0 0 auto; }
+  .ig-mega__cats { position: sticky; top: 0; z-index: 1; background: var(--surface-card); padding-right: var(--space-8); }
+  .ig-mega__close { display: inline-flex; position: fixed; top: var(--space-2_5); right: var(--space-2_5); z-index: 2; background: var(--surface-card); }
+
+  .ig-hero { padding-block: var(--space-5); }
+  .ig-hero__title { font-size: var(--font-size-h1); }
+
+  .ig-cathero { --cb-size: 136px; --cb-gap: var(--space-2_5); --cb-gutter: var(--gutter-sm); --cb-inset: var(--space-2); --cb-fade: 48px; --cb-pad-b: var(--space-5); }
+  .ig-cathero__crumbs { padding-left: 0; }
+  /* в баннере 136 px разрядка не помещает «Окрашивание» — на телефоне подпись без неё */
+  .ig-banner__t { letter-spacing: var(--tracking-normal); }
+
+  .ig-directions__arrow { display: none; }
+  .ig-direction--icon { --dir-icon: 80px; }
+  .ig-direction__icon { clip-path: path("M -300 -300 H 1300 V 66 H 17 A 26 26 0 0 1 -9 40 H -300 Z"); }   /* иконка 80: выступ 14 */
+
+  .ig-toolbar__right { width: 100%; justify-content: space-between; margin-left: 0; }
+
+  .ig-grid { grid-template-columns: repeat(2, 1fr); }
+  /* узкая карточка: промежутки меньше, цена и ссылка — те же две половины, кегли чуть меньше */
+  .ig-grid { column-gap: var(--space-4); row-gap: var(--space-7); }
+  .ig-card__name { padding-inline: 0; font-size: var(--font-size-body-sm); line-height: 18.2px; }
+  .ig-card__price { gap: var(--space-3); }
+  .ig-card__price-v { font-size: var(--font-size-body-lg, 17px); }
+  .ig-card__qty-btn { width: 36px; }
+
+  .ig-drawer { width: 100%; max-width: 100%; border-radius: 0; }
+  .ig-drawer__foot [data-apply] { flex: 2; }
+
+  .ig-footer__inner { flex-direction: column; align-items: flex-start; gap: var(--space-3); }
+}
+
+/* меньше движения: длительности и масштаб нажатия гасит сама ДС (elevation.css) */
+@media (prefers-reduced-motion: reduce) {
+  .ig-directions__track { scroll-behavior: auto; }
+  /* меню каталога — только проявление, без шторки и сдвига */
+  .ig-mega, .ig-mega.is-open { transform: none; clip-path: none; }
+  .ig-banner:hover .ig-banner__img,
+  .ig-card__media:hover .ig-card__img { transform: none; }
+}
+
+/* ==========================================================================
+   ШАПКА ПОВЕРХ БАННЕРА — эксперимент ветки design-lab (20.10.2026), референс goldapple.ru
+   Плашка со скидкой — сплошная, уезжает вместе со страницей. Шапка и меню — один блок .ig-mast поверх
+   баннера страницы: слот нулевой высоты прилипает к верху окна, поэтому сжатие шапки не сдвигает страницу.
+   Поведение снято с goldapple.ru (20.10.2026):
+   · в самом верху страницы (is-clear) — прозрачная; цвет текста — под баннер: на тёмном белый (is-on-dark),
+     на светлом тёмный; курсор над шапкой, фокус в ней или открытый каталог — белая подложка и тёмный текст;
+   · стоит прокрутить хоть немного — белая подложка; вниз — шапка сжимается (is-collapsed): меню уезжает
+     вверх под строку логотипа и гаснет, от строки остаются знак логотипа и иконки; вверх — меню выезжает;
+   · под шапкой тонкая линия в цвет текста, 10 % непрозрачности;
+   · длительности референса: подложка и сжатие — 0,25 с ease-in-out; пункты меню гаснут за 0,125 с,
+     а появляются с задержкой 0,125 с; цвет — 0,15 с.
+   Состояния ставит script.js. Цвета — через переменные --mast-*, белая подложка их сбрасывает
+   ========================================================================== */
+.ig-mast-slot { position: sticky; top: 0; z-index: var(--z-sticky); height: 0; }
+/* компактная шапка выезжает сверху за 0,25 с; полная уходит вместе со страницей (сдвиг без перехода) */
+.ig-mast.is-compact { transition: background-color var(--mast-dur) var(--mast-ease), color 0.15s var(--mast-ease), transform var(--mast-dur) var(--mast-ease); }
+.ig-mast.is-compact.is-entering { transform: translateY(-100%); transition: none; }
+.ig-mast {
+  --mast-dur: 0.25s;                       /* как у референса; при «уменьшить движение» — мгновенно */
+  --mast-ease: ease-in-out;
+  --mast-bg: var(--surface-card);
+  --mast-fg: var(--text-default);
+  --mast-icon: var(--text-muted);
+  --mast-logo-ink: #363a3a;                /* слово «ИГРО» – по логотипу «полосы-3» (11.11): светлый фон Figma 3116:3064 #363A3A, тёмный 3116:3079 #F2F0EB */
+  --mast-mark-ink: #111111;
+  --mast-menu: #335351;                   /* 27.10: плашка меню (было --surface-band-dark, House #1A3328) */
+  --mast-accent: #3c8883;                 /* 26.10: цвет верхней плашки «Скидка 15 %» (.ig-topbar) – полосы знака и линия пункта меню */
+  --mast-mark-accent: var(--mast-accent);  /* две полосы знака – и на светлом, и на тёмном фоне (было #004522 и белые) */
+  --mast-field: var(--surface-subtle);
+  --mast-field-line: transparent;          /* поиск без обводки (21.10); обводка — в фокусе */
+  --mast-field-fg: var(--text-default);
+  position: relative;
+  color: var(--mast-fg);
+  background-color: var(--mast-bg);
+  transition: background-color var(--mast-dur) var(--mast-ease), color 0.15s var(--mast-ease);
+}
+/* линии под шапкой нет (27.10; была 1 px в цвет текста, 10 %, как у референса) – строку меню выделяет плашка */
+/* в самом верху — прозрачная, баннер просвечивает; поле поиска полупрозрачное */
+.ig-mast.is-clear {
+  background-color: transparent;           /* белая подложка при наведении – слой ::before до середины плашки меню (ниже) */
+  --mast-bg: transparent;
+  --mast-field: color-mix(in srgb, var(--surface-card) 55%, transparent);
+  --mast-field-line: transparent;
+}
+/* тёмный баннер (страница категории с мини-баннерами): текст, иконки и логотип — белые */
+.ig-mast.is-clear.is-on-dark {
+  --mast-fg: var(--text-on-dark);
+  --mast-icon: var(--text-on-dark);
+  --mast-logo-ink: #f2f0eb;
+  --mast-mark-ink: var(--text-on-dark);
+  --mast-logo-dark: 1;                       /* знак для тёмного фона – тоньше линии (ниже, .ig-logo__svg-dark) */
+  --mast-mark-accent: #6bb5b0;               /* логотип для тёмного фона (Figma 2636:1979) белый, кроме двух полос; полосы и «22 года
+                                               с вами» – #6BB5B0, светлее цвета плашки (27.10; с 26.10 был цвет плашки #3C8883) */
+}
+/* фокус внутри шапки или открытый каталог — белая подложка, как при наведении */
+.ig-mast.is-clear:focus-within,
+.ig-mast.is-clear:has(.ig-mega.is-open) {
+  --mast-bg: var(--surface-card);
+  --mast-fg: var(--text-default);
+  --mast-icon: var(--text-muted);
+  --mast-logo-ink: #363a3a;
+  --mast-mark-ink: #111111;
+  --mast-mark-accent: var(--mast-accent);
+  --mast-logo-dark: 0;
+  --mast-field: var(--surface-subtle);
+  --mast-field-line: transparent;
+  --mast-field-fg: var(--text-default);
+}
+@media (hover: hover) {
+  .ig-mast.is-clear:hover {
+    --mast-bg: var(--surface-card);
+    --mast-fg: var(--text-default);
+    --mast-icon: var(--text-muted);
+    --mast-logo-ink: #363a3a;
+    --mast-mark-ink: #111111;
+    --mast-mark-accent: var(--mast-accent);
+    --mast-logo-dark: 0;
+    --mast-field: var(--surface-subtle);
+    --mast-field-line: transparent;
+    --mast-field-fg: var(--text-default);
+  }
+}
+
+/* строка логотипа */
+.ig-mast .ig-header { background: none; border-bottom: 0; }
+.ig-mast .ig-header__inner { transition: padding var(--mast-dur) var(--mast-ease); }
+.ig-mast .ig-logo { color: var(--mast-fg); transition: gap var(--mast-dur) var(--mast-ease); }
+/* логотип из Figma: квадратный (2747:4258) — знак, под ним «ИГРО» (кегль 0,305 ширины знака, отступ 0,1);
+   горизонтальный (2636:1957) — «ИГРО» справа (кегль 0,79 высоты знака, отступ 0,26). Разрядка 0,15em.
+   Переход: знак плавно меняет размер, слово гаснет, на середине переезжает (flex-direction, allow-discrete)
+   и снова проявляется */
+.ig-mast .ig-logo__mark {
+  gap: 6px;
+  transition: gap var(--mast-dur) var(--mast-ease), flex-direction var(--mast-dur) allow-discrete;
+}
+.ig-logo__svg { display: block; width: 65px; height: auto; }
+.ig-logo__svg .m-ink, .ig-logo__svg-dark .m-ink { fill: var(--mast-mark-ink, #111111); transition: fill 0.15s ease; }
+.ig-logo__svg .m-acc, .ig-logo__svg-dark .m-acc { fill: var(--mast-mark-accent, #004522); transition: fill 0.15s ease; }
+.ig-mast .ig-logo__svg { opacity: calc(1 - var(--mast-logo-dark, 0)); transition: width var(--mast-dur) var(--mast-ease), opacity 0.15s ease; }
+/* знак для тёмного фона (Figma 2636:1873, 27.10) – линии тоньше: белое на тёмном кажется жирнее. Лежит поверх обычного
+   знака и проявляется вместо него, когда шапка в варианте для тёмного фона (--mast-logo-dark: 1) */
+.ig-logo__sign { position: relative; display: block; flex: none; }
+.ig-logo__svg-dark { position: absolute; inset: 0; width: 100%; height: 100%; opacity: var(--mast-logo-dark, 0); transition: opacity 0.15s ease; pointer-events: none; }
+.ig-mast .ig-logo__word { font-size: 20px; color: var(--mast-logo-ink); transition: color 0.15s var(--mast-ease), font-size var(--mast-dur) var(--mast-ease); }
+.ig-mast.is-compact .ig-logo__word { animation: ig-logo-swap var(--mast-dur) var(--mast-ease); }
+.ig-mast.was-compact:not(.is-compact) .ig-logo__word { animation: ig-logo-swap-back var(--mast-dur) var(--mast-ease); }
+@keyframes ig-logo-swap { 0% { opacity: 1; } 35%, 60% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes ig-logo-swap-back { 0% { opacity: 1; } 35%, 60% { opacity: 0; } 100% { opacity: 1; } }
+.ig-mast .ig-logo__motto { color: var(--mast-fg); transition: color 0.15s var(--mast-ease); }
+.ig-mast .ig-logo__tagline { max-width: 240px; max-height: 80px; overflow: hidden; white-space: nowrap; transition: max-width var(--mast-dur) var(--mast-ease), max-height var(--mast-dur) var(--mast-ease), opacity 0.15s var(--mast-ease); }
+.ig-mast .igro-search {
+  /* 26.10 (только в лабе, в ДС такого поля нет): без рамки и заливки – линия 1 px снизу в цвет текста шапки,
+     слева иконка и подсказка; в фокусе – белое поле с фирменным зелёным контуром, как у поиска ДС */
+  padding-inline: var(--space-2);
+  border: 0;
+  border-radius: var(--radius-field) var(--radius-field) 0 0;
+  background: transparent;
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--mast-fg) 50%, transparent);   /* линия – 50 % (26.10); в фокусе контур как был */
+  transition: background var(--mast-dur) var(--mast-ease), box-shadow 0.15s var(--mast-ease), border-radius 0.15s var(--mast-ease), opacity 0.15s var(--mast-ease), visibility 0.15s var(--mast-ease);
+}
+/* цвет текста и иконки меняется плавно, как у остальной шапки (26.10: без перехода они «моргали» при наведении) */
+.ig-mast .igro-search__input { color: var(--mast-fg); transition: color 0.15s var(--mast-ease); }
+.ig-mast .igro-search__input::placeholder { color: currentColor; opacity: 0.7; }
+.ig-mast .igro-search__icon { color: var(--mast-fg); transition: color 0.15s var(--mast-ease); }
+.ig-mast .igro-search:focus-within {
+  background: var(--surface-card);
+  border-radius: var(--radius-field);
+  box-shadow: inset 0 0 0 1px var(--border-focus), var(--focus-field);
+}
+.ig-mast .igro-search:focus-within .igro-search__input { color: var(--text-default); }
+.ig-mast .igro-search:focus-within .igro-search__icon { color: var(--action-accent); }
+/* иконки и подписи — в цвет текста шапки, как у референса (в ДС ghost IconButton – серые) */
+.ig-mast .ig-actions .igro-icon-btn,
+.ig-mast .ig-action { color: var(--mast-fg); }
+.ig-mast .ig-cart { color: var(--mast-fg); }
+.ig-mast .ig-action__label,
+.ig-mast .ig-cart__sum { max-width: 200px; overflow: hidden; white-space: nowrap; transition: max-width var(--mast-dur) var(--mast-ease), opacity 0.15s var(--mast-ease); }
+.ig-search-btn { display: none; }
+
+/* строка меню – тёмная плашка House, как полоса меню в v6, но не от края до края экрана, а только под пунктами:
+   от «Каталога» до «Контактов» (по краям контейнера – вровень с логотипом и корзиной) (27.10). Белеет при наведении
+   только подложка шапки вокруг – плашка и белые пункты меню не меняются ни на прозрачной, ни на белой шапке.
+   Сжимается сеткой 1fr → 0fr */
+.ig-mast .ig-mainnav {
+  display: grid;
+  grid-template-rows: 1fr;
+  background: none;
+  color: var(--text-on-dark);
+  transition: grid-template-rows var(--mast-dur) var(--mast-ease);
+}
+.ig-mast .ig-mainnav__inner {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;                      /* плашка поверх выпадающего каталога: тот выезжает из-под неё (27.10) */
+  z-index: calc(var(--z-dropdown) + 1);
+  transition: opacity 0.125s var(--mast-ease) 0.125s, visibility 0.125s var(--mast-ease) 0.125s;
+}
+/* белая подложка шапки доходит до середины плашки меню, а не до её низа (27.10): по бокам от нижней половины
+   плашки – баннер. Просвет рядом с нижней половиной при открытом каталоге закрывает сам каталог (он начинается
+   от середины плашки, ниже). Один слой на всю высоту – без шва на стыке строки логотипа и меню */
+.ig-mast { isolation: isolate; }
+.ig-mast::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  bottom: calc(var(--size-field) / 2 - 1px);   /* середина плашки меню (56 px) и 1 px под край каталога – на стыке двух
+                                               дробных краёв (163,09 px) оставалась серая полоска */
+  z-index: -1;
+  background-color: var(--mast-bg);
+  pointer-events: none;
+  transition: background-color var(--mast-dur) var(--mast-ease);
+}
+/* каталог открыли прямо с баннера – подложка белеет так же быстро, как проявляется каталог, без стыка на середине плашки */
+.ig-mast:has([data-toggle="mega"]:hover, .ig-mega.is-open)::before { transition: background-color var(--duration-fast) ease; }   /* как opacity каталога; :hover – с того же кадра, что и наведение */
+/* сама плашка – слой ::before в пределах полей контейнера, со скруглением 4 px (27.10; до того – фон с
+   background-clip: content-box, его не скруглить). Поля – как у .ig-container на этой ширине */
+.ig-mast .ig-mainnav__inner::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  left: var(--gutter-lg); right: var(--gutter-lg);
+  z-index: -1;
+  border-radius: 4px;
+  background: var(--mast-menu);
+}
+/* крайние пункты – залитые при наведении, «Каталог» и «Контакты» – скруглены вместе с плашкой */
+.ig-mast .ig-mainnav__list:first-child > .ig-navlink:first-child { border-radius: 4px 0 0 4px; }
+.ig-mast .ig-mainnav__list--end > .ig-navlink:last-child { border-radius: 0 4px 4px 0; }
+@media (max-width: 1279px) {
+  .ig-mast .ig-mainnav__inner::before { left: var(--gutter-md); right: var(--gutter-md); }
+}
+/* на узком экране меню прокручивается вбок – плашка во всю ширину, без скругления, как в v6 */
+@media (max-width: 900px) {
+  .ig-mast .ig-mainnav__inner { background: var(--mast-menu); }   /* фон самой строки – едет при прокрутке вбок */
+  .ig-mast .ig-mainnav__inner::before { display: none; }
+  .ig-mast .ig-mainnav__list > .ig-navlink { border-radius: 0; }
+}
+/* пункт при наведении и открытый «Каталог» – залит целиком цветом верхней плашки #3C8883 (27.10; до того – линия 3 px снизу) */
+.ig-mast .ig-navlink {
+  height: var(--size-field);
+  color: inherit;
+  transition: background-color 0.15s var(--mast-ease), color 0.15s var(--mast-ease);
+}
+.ig-mast .ig-navlink[aria-expanded="true"] { background: var(--mast-accent); }
+@media (hover: hover) {
+  .ig-mast .ig-navlink:hover { background: var(--mast-accent); color: inherit; }
+}
+/* выпадающий каталог в шапке – без линии сверху: белая шапка и каталог – один белый фон (27.10). Фон каталога
+   начинается от середины плашки меню, из-под неё (плашка выше по z-index), и закрывает просвет рядом с нижней
+   половиной плашки – выезжает вместе с каталогом одной шторкой; содержимое опущено на ту же половину плашки */
+@media (min-width: 901px) {
+  .ig-mast .ig-mega { border-top: 0; top: calc(100% - var(--size-field) / 2); padding-top: calc(var(--size-field) / 2); }
+}
+
+/* сжатая шапка: знак логотипа и иконки, без подписей; меню спрятано */
+.ig-mast.is-collapsed .ig-mainnav { grid-template-rows: 0fr; }
+/* мини-шапка (прокрутка вниз, меню спрятано) – с тенью снизу, как у закреплённой панели фильтров (27.10). Только в этом
+   состоянии: у шапки с меню тени нет – она не ложится на панель фильтров под ней. Появляется вместе со сжатием,
+   пропадает сразу (переход задан только здесь) – меню выезжает уже без тени */
+.ig-mast.is-compact.is-collapsed {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  transition: background-color var(--mast-dur) var(--mast-ease), color 0.15s var(--mast-ease), transform var(--mast-dur) var(--mast-ease),
+              box-shadow var(--mast-dur) var(--mast-ease);
+}
+.ig-mast.is-collapsed .ig-mainnav__inner { opacity: 0; visibility: hidden; transition-delay: 0s; }
+.ig-mast.is-compact .ig-header__inner { padding-block: var(--space-2); }
+.ig-mast.is-compact .ig-logo { gap: var(--space-3); }
+.ig-mast.is-compact .ig-logo__mark { flex-direction: row; gap: 8px; }
+.ig-mast.is-compact .ig-logo__svg { width: 33px; }
+.ig-mast.is-compact .ig-logo__word { font-size: 25px; }
+/* 26.10: в сжатой шапке справа от горизонтального логотипа – слоган «в отношениях надежны, в качестве постоянны!»
+   по левому краю, без «22 года с вами»; поиск, избранное, вход и корзина остаются на своих местах
+   (меняется только цвет – белая подложка); кнопка-лупа – только на телефоне, где поле поиска сворачивается */
+.ig-mast.is-compact .ig-logo__tagline { align-items: flex-start; gap: 0; text-align: left; }   /* gap 0 – слоган по центру слова «ИГРО» */
+.ig-mast.is-compact .ig-logo__motto { font-size: var(--font-size-body-sm); }
+.ig-mast .ig-logo__years { max-height: 20px; overflow: hidden; transition: max-height var(--mast-dur) var(--mast-ease), opacity 0.15s var(--mast-ease); }
+.ig-mast.is-compact .ig-logo__years { max-height: 0; opacity: 0; }
+
+/* баннер начинается под плашкой со скидкой и уходит под шапку: сверху к нему добавлена высота шапки
+   (--mast-h ставит script.js). Фоны «Волос» — высокие полосы assets/hero-tall/*.webp (27.10: с градиентом и размытием верха из Figma) */
+.ig-hero { padding-top: calc(var(--space-7) + var(--mast-h, 0px)); }
+.ig-cathero { padding-top: calc(var(--space-3) + var(--mast-h, 0px)); }
+@media (max-width: 767px) {
+  .ig-hero { padding-top: calc(var(--space-5) + var(--mast-h, 0px)); }
+  .ig-mast.is-compact .ig-logo__svg { width: 28px; }
+  .ig-mast.is-compact .ig-logo__word { font-size: 21px; }
+  .ig-mast .ig-logo__word { font-size: var(--font-size-micro); }
+  /* на телефоне поиск – отдельной строкой: в сжатой шапке строка складывается вместе с отступом над ней */
+  .ig-mast .ig-header__inner { transition: padding var(--mast-dur) var(--mast-ease), row-gap var(--mast-dur) var(--mast-ease); }
+  .ig-mast .ig-search { max-height: var(--size-control-md); overflow: hidden; transition: max-height var(--mast-dur) var(--mast-ease), opacity 0.15s var(--mast-ease), visibility 0.15s var(--mast-ease), background var(--mast-dur) var(--mast-ease); }
+  .ig-mast.is-compact .ig-header__inner { row-gap: 0; }
+  .ig-mast.is-compact .ig-search { max-height: 0; border-width: 0; opacity: 0; visibility: hidden; }
+  .ig-mast.is-compact .ig-search-btn { display: inline-flex; }
+  .ig-mast.is-compact .ig-logo__tagline { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ig-mast { --mast-dur: 0.01s; }
+  .ig-mast .ig-mainnav__inner { transition-duration: 0.01s; transition-delay: 0s; }
+}
+
+/* ==========================================================================
+   ПАНЕЛЬ ФИЛЬТРОВ ПОД ШАПКОЙ — эксперимент ветки design-lab (20.10.2026), референс goldapple.ru/volosy
+   Панель (кнопка «Фильтры», бренды, число товаров, сортировка, тип продукта, технология) сначала стоит
+   на своём месте. Ушла под шапку — закрепляется сразу под полной шапкой (is-stuck), секция держит её высоту.
+   Прокрутка вниз — шапка сжимается, панель уезжает вверх за неё (is-hidden); вверх — выезжает вместе
+   с меню шапки. Как у референса: 0,25 с ease-in-out, снизу линия 1 px. Состояния ставит script.js
+   ========================================================================== */
+.ig-toolbar { padding-block: 0; }
+/* сдвиг панели (спрятать/показать, переезд на место и под шапку) – 0,25 с ease-in-out, как у шапки */
+.ig-toolbar__panel { padding-block: var(--space-4); background: var(--surface-page); transition: transform 0.25s ease-in-out; }
+.ig-toolbar__panel.is-stuck {
+  position: fixed;
+  left: 0; right: 0;
+  top: calc(var(--tb-top, var(--mast-h, 0px)) - 1px);   /* вплотную под компактной шапкой с меню */
+  z-index: calc(var(--z-sticky) - 1);     /* под шапкой — уезжает за неё */
+  border-bottom: 1px solid var(--border-subtle);
+}
+.ig-toolbar__panel.is-stuck.is-hidden { transform: translateY(calc(-100% - var(--tb-top, var(--mast-h, 0px)) - 20px)); }
+.ig-toolbar__panel.is-instant { transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  .ig-toolbar__panel { transition-duration: 0.01s; }
+}
+
+/* фон каталога – как в v6 (--surface-page, решение 21.10, белый фон отменён): одиночные товары стоят прямо на фоне,
+   продукты с вариантами – на белых плашках-стопках */
+
+/* иконка «Каталога» – сплошная заливка без обводки (просьба 21.10): те же четыре плитки, залитые */
+.ig-navlink .ig-ic--grid { --ic: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27%23000%27%3E%3Crect%20x=%273%27%20y=%273%27%20width=%278%27%20height=%2710%27%20rx=%271.5%27/%3E%3Crect%20x=%2713%27%20y=%273%27%20width=%278%27%20height=%276%27%20rx=%271.5%27/%3E%3Crect%20x=%2713%27%20y=%2711%27%20width=%278%27%20height=%2710%27%20rx=%271.5%27/%3E%3Crect%20x=%273%27%20y=%2715%27%20width=%278%27%20height=%276%27%20rx=%271.5%27/%3E%3C/svg%3E"); }
+
+/* выбранные чипы брендов (бренд, линия с крестиком; «Все бренды» убран 26.10) – не заливка, а тёмная обводка 2 px
+   (рамка 1 px + внутренняя тень 1 px – размер чипа не меняется); меньше внимания, чем залитый чип (просьба 21.10) */
+.ig-toolbar .igro-tag[aria-pressed="true"],
+.ig-toolbar .igro-tag--selected {
+  background: var(--surface-card);
+  border-color: var(--surface-inverse);
+  box-shadow: inset 0 0 0 1px var(--surface-inverse);
+  color: var(--text-default);
+}
+.ig-toolbar .igro-tag__remove { color: var(--text-muted); }
+@media (hover: hover) {
+  .ig-toolbar .igro-tag__remove:hover { color: var(--text-default); }
+}
+
+/* ширина чипов, ссылок «Тип продукта» и кнопки «Фильтры» не меняется при выборе (замечание 21.10):
+   подпись и её невидимая полужирная копия лежат в одной ячейке – ширина сразу под полужирный текст;
+   у «Фильтров» место под «· N» есть всегда */
+.ig-tw { display: inline-grid; }
+.ig-tw::after { content: attr(data-t); grid-area: 1 / 1; height: 0; overflow: hidden; visibility: hidden; font-weight: var(--weight-semibold); pointer-events: none; }
+.ig-tw > * , .ig-tw { min-width: 0; }
+/* ссылки «Тип продукта» – без обёртки (иначе пропадает подчёркивание и сбивается базовая линия):
+   ссылка – колонка, текст первой строкой, под ним невидимая полужирная копия нулевой высоты */
+.ig-tlink[data-t] { display: inline-flex; flex-direction: column; align-items: flex-start; }
+/* спрятанная обрезкой ссылка (атрибут hidden) должна скрываться – правило выше иначе перебивает hidden (баг 23.10: «ещё (19)» при всех видимых типах) */
+.ig-tlink[data-t][hidden] { display: none; }
+.ig-tlink[data-t]::after { content: attr(data-t); height: 0; overflow: hidden; visibility: hidden; font-weight: var(--weight-semibold); pointer-events: none; }
+.ig-btn__num { display: inline-block; min-width: 3ch; text-align: left; }
+.ig-btn__num.is-empty { display: none; }
+.ig-filters-btn.is-measure .ig-btn__num.is-empty { display: inline-block; visibility: hidden; }
+.ig-filters-btn { justify-content: center; }
+/* полная шапка после компактной встаёт сразу в своём виде, без перестройки (переходы отключены на кадр) */
+.ig-mast.no-anim, .ig-mast.no-anim * { transition: none !important; animation: none !important; }
+
+/* уведомления – в правом верхнем углу, 12 px от края; сверху – ниже строки компактной шапки (60 px на всех ширинах,
+   без строки «Каталог … Контакты») + 12 px (23.10); на десктопе узкие – 320 px */
+.igro-toast-region--top { top: calc(60px + 12px); right: 12px; }
+@media (min-width: 1024px) {
+  .igro-toast-region--top { width: 320px; }
+}
+
+/* «Каталог»: с 27.10 – внутри плашки, вровень с логотипом её левый край (до того иконка выносилась к линии логотипа) */
+
+/* квадратный логотип меньше: знак 52 px, «ИГРО» 16 px (23.10). Логотип выше поля поиска;
+   с 04.11 поиск и иконки – по центру его высоты */
+@media (min-width: 768px) {
+  .ig-mast .ig-logo__svg { width: 52px; }
+  .ig-mast .ig-logo__word { font-size: 16px; }
+  .ig-mast .ig-logo__mark { gap: 5px; }
+  /* 04.11: полная шапка – поиск и иконки по центру высоты логотипа (общее align-items: center).
+     С 23.10 строка была выровнена по нижнему краю – низ «ИГРО» на линии поля поиска; Антон попросил по центру */
+  /* 26.10: место под логотип одной ширины в полной и сжатой шапке (= сжатый логотип со слоганом, 288 px) –
+     поле поиска не сдвигается при переходе */
+  .ig-mast .ig-logo { min-width: 290px; }
+}
+
+/* иконка квадратной кнопки корзины – «корзина с плюсом» (Figma 2755:464): в раскрытом блоке обычная корзина
+   гаснет, на её месте проявляется корзина с плюсом (плюс выступает влево и вниз за поле 20 px, как в макете) */
+.ig-card__buyicon { position: relative; }
+.ig-card__buyicon svg:first-child { transition: width var(--buy-base) var(--ease-standard), height var(--buy-base) var(--ease-standard), opacity var(--buy-fast) ease; }
+.ig-card__buyicon .ig-card__buyicon-add {
+  position: absolute;
+  left: -1.16px;
+  top: 0;
+  width: 21.16px;
+  height: 21.84px;
+  opacity: 0;
+  transition: opacity var(--buy-fast) ease;
+}
+.ig-card__buy.is-open .ig-card__buyicon svg:first-child { opacity: 0; }
+.ig-card__buy.is-open .ig-card__buyicon .ig-card__buyicon-add { opacity: 1; transition-delay: var(--buy-fast); }
+.ig-card__buy .ig-card__buyicon svg.ig-card__buyicon-add,
+.ig-card__buy.is-open .ig-card__buyicon svg.ig-card__buyicon-add { width: 21.16px; height: 21.84px; }   /* размер из макета – сильнее общего правила иконок 18/20 px */
+
+/* закреплённая панель фильтров (поверх товаров) – сплошной фон каталога (27.10; с 23.10 было матовое стекло) */
+.ig-toolbar__panel.is-stuck {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);   /* тень под панелью – на 2 px ниже линии (23.10) */
+  background: var(--surface-page);
+}
+/* матовое стекло (frost glass, 23.10): полупрозрачный фон и размытие того, что под ним – у уведомлений */
+.igro-toast-region .igro-toast {
+  background: color-mix(in srgb, var(--surface-card) 72%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+}
+
+/* уведомление о добавлении в корзину – с превью товара слева: 56 px, белая подложка (фото на белом фоне) (23.10) */
+.igro-toast__thumb {
+  flex: none;
+  width: 56px; height: 56px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: var(--radius-field);
+}
+
+/* чип раскрытого продукта: название в одну строку, длинное – с многоточием (23.10) */
+.ig-tag-product { max-width: 100%; min-width: 0; }
+.ig-tag-product__t { display: inline-block; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+@media (max-width: 767px) {
+  .ig-tag-product__t { max-width: 180px; }
+}
+
+/* выбор признаков в карточке продукта (26.10): плашки-списки в одну строку, без подписей; список – Menu ДС;
+   значение, которого нет с остальным выбором, – серое, но выбирается (подставится ближайший товар) */
+.ig-card__opts { display: flex; gap: 6px; margin-top: auto; padding-top: 12px; }
+/* списки прижаты к цене: в ряду карточек стоят на одной высоте, как цена, при названии в 1–3 строки */
+.ig-card--opts .ig-card__price { margin-top: 0; }
+.ig-card__dd { position: relative; flex: 1 1 0; min-width: 0; }
+.ig-card__dd-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  width: 100%;
+  height: 32px;
+  padding: 0 8px 0 12px;
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  background: var(--surface-card);
+  color: var(--text-default);
+  font: var(--weight-semibold) var(--font-size-micro)/1 var(--font-ui);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) ease;
+}
+.ig-card__dd-btn span { overflow: hidden; text-overflow: ellipsis; }
+.ig-card__dd-btn .ig-ic { flex: none; transition: transform var(--duration-fast) var(--ease-standard); }
+.ig-card__dd.is-open .ig-card__dd-btn { border-color: var(--surface-inverse); }
+.ig-card__dd.is-open .ig-card__dd-btn .ig-ic { transform: rotate(180deg); }
+@media (hover: hover) {
+  .ig-card__dd-btn:hover { border-color: var(--surface-inverse); }
+}
+.ig-card__dd-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: var(--z-dropdown);
+  min-width: 100%;
+  width: max-content;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: var(--space-1);
+}
+.ig-card__dd-item { padding: 7px 10px; font-size: var(--font-size-body-sm); font-weight: var(--weight-semibold); white-space: nowrap; }
+.ig-card__dd-item.is-off { color: var(--text-muted); font-weight: 400; }
+/* открытый список – над соседними карточками: z-index только у самого списка (в контексте сетки). У карточки
+   z-index не ставить – она станет своим контекстом наложения, и слой стопки (z-index: −1) ляжет поверх её рамки */
+.ig-card__pane[hidden] { display: none; }
+
+/* эксперимент 26.10: внутри продукта название (у всех товаров одно) – серое, того же размера; подпись, которая
+   отличает товары (оттенок, объём, размер), – тёмная полужирная */
+.ig-card--variant .ig-card__name { color: var(--text-muted); }
+.ig-card--variant .ig-card__desc { color: var(--text-default); font-weight: var(--weight-bold); }
+
+/* ==========================================================================
+   ГЛАВНАЯ КАТАЛОГА (index.html, 03.11.2026) – по макету Figma «IB – my DESIGN», узел 2862:4831.
+   Шапка и подвал – как на страницах каталога (render.js рисует только меню, подвал и корзину: body data-page="home").
+   Картинки – assets/home: баннеры категорий выгружены из макета целиком, без надписей (фото + градиент),
+   надписи – текстом. Шрифты макета Inter и Oswald заменены шрифтами ДС
+   ========================================================================== */
+/* фон главной белый, как в макете: у эмблем подборок и плиток белая подложка */
+body.igro[data-page="home"] { background: var(--surface-card); }
+.ig-home { padding-top: var(--mast-h, 0px); }
+/* 04.11, Антон: подвал ближе к последнему ряду баннеров – вдвое (было 24 + 64 + 64 = 152 px, стало 76; отступ ряда схлопывается с отступом подвала) */
+body.igro[data-page="home"] .ig-footer { margin-top: 76px; }
+.ig-home__strip {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-2) var(--space-4);
+  padding: var(--space-3) 0;
+  font-family: var(--font-heading); font-size: 16px; color: var(--text-default);
+}
+.ig-home__delivery { margin: 0; }
+.ig-home__delivery b, .ig-home__pro { font-weight: var(--weight-bold); text-transform: uppercase; }
+.ig-home__delivery b:last-child { text-transform: none; }
+.ig-home__pro { color: var(--text-default); }
+.ig-home__pro:hover { color: var(--text-link); }
+
+/* верх главной (03.11, просьба Антона): слева 4 плашки подборок 2×2, справа «Волосы» над «Бровями».
+   Одна сетка в 4 колонки: баннер занимает 2 колонки и задаёт высоту ряда (667 : 241), плашки тянутся на ту же высоту –
+   пара плашек вместе равна баннеру. Фоны плашек – светлые палитры В, по одному на семейство; 04.11 Антон в Figma 2884:5151 сделал все светло-серыми #EDEDED */
+.ig-home__top { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); margin: var(--space-4) 0; }
+.ig-home__top > .ig-cat { grid-column: span 2; }
+.ig-promo {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-2);
+  min-width: 0; padding: var(--space-3); border-radius: 12px; background: var(--promo-bg); color: var(--text-default); text-align: center;
+  transition: box-shadow var(--duration-base);
+}
+.ig-promo--new      { --promo-bg: #ededed; }
+.ig-promo--top      { --promo-bg: #ededed; }
+.ig-promo--markdown { --promo-bg: #ededed; }
+.ig-promo--sale     { --promo-bg: #ededed; }
+.ig-promo img { flex: 1 1 0; min-height: 0; width: 100%; max-width: 100%; object-fit: contain; transition: transform var(--duration-base); }
+@media (hover: hover) { .ig-promo:hover img { transform: scale(1.05); } }
+.ig-promo__t { font-family: var(--font-heading); font-weight: var(--weight-bold); font-size: 20px; line-height: 1.15; text-transform: uppercase; }
+.ig-promo:hover .ig-promo__t { color: var(--text-link); }
+
+/* баннеры категорий: по два в ряд, 667×241 в макете; надпись слева или справа (ig-cat--end) */
+.ig-cats { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin: var(--space-4) 0; }
+.ig-cat {
+  position: relative; display: flex; aspect-ratio: 667 / 241; min-height: 200px; overflow: hidden;
+  border-radius: 12px; background: var(--cat-bg, #e7e6eb);   /* --cat-bg – фон картинки (04.11), виден, пока она грузится */ color: var(--text-default);
+}
+/* картинка – отдельным слоем, чтобы при наведении слегка увеличиваться, как в плашках и квадратах (04.11) */
+.ig-cat::before { content: ""; position: absolute; inset: 0; background: var(--cat-img) center / cover no-repeat; transition: transform var(--duration-base) var(--ease-standard); }
+.ig-cat > * { position: relative; }
+/* увеличение – от центра предметов, а не карточки: предметы стоят справа (текст слева) или слева (ig-cat--end), иначе картинка «уезжает» в сторону */
+.ig-cat::before { transform-origin: 74% 58%; }
+.ig-cat--end::before { transform-origin: 26% 58%; }
+@media (hover: hover) { .ig-cat:hover::before { transform: scale(1.05); } }
+.ig-cat--end { justify-content: flex-end; text-align: right; }
+.ig-cat__body { display: flex; flex-direction: column; align-items: flex-start; max-width: 52%; padding: 28px 30px 24px; }
+.ig-cat--end .ig-cat__body { align-items: flex-end; }
+.ig-cat__t { font-family: var(--font-heading); font-weight: var(--weight-bold); font-size: 32px; line-height: 1.17; text-transform: uppercase; }
+.ig-cat__d { margin-top: var(--space-3); font-size: 15px; line-height: 1.3; color: var(--text-muted); max-width: 15em; }
+.ig-cat__go { margin-top: auto; padding-top: var(--space-3); font-family: var(--font-heading); font-weight: var(--weight-semibold); font-size: 18px; text-transform: uppercase; }
+.ig-cat:hover .ig-cat__go { color: var(--text-link); }
+
+/* одноразовая продукция: заголовок с кнопкой и подкатегории плитками */
+.ig-dispo { display: grid; grid-template-columns: minmax(240px, 300px) 1fr; gap: var(--space-4); align-items: start; margin: var(--space-6) 0; padding-left: 30px; }
+.ig-dispo__t { margin: var(--space-2) 0 var(--space-4); font-family: var(--font-heading); font-weight: var(--weight-bold); font-size: 32px; line-height: 1.2; text-transform: uppercase; color: var(--text-default); }
+.ig-dispo__btn { text-transform: uppercase; font-family: var(--font-heading); font-size: 18px; font-weight: var(--weight-semibold); border-radius: 3px; }
+.ig-dispo__list { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--space-3); }
+/* 03.11: плитки – такие же баннеры, как в шапке категории (.ig-banner, подпись внутри в левом верхнем углу),
+   только тянутся на ширину колонки */
+.ig-dispo__list .ig-banner { --cb-size: auto; --cb-inset: var(--space-3); width: 100%; height: auto; aspect-ratio: 1; }
+.ig-dispo__list .ig-banner:focus-visible { outline-color: var(--text-link); }
+
+/* лучшее предложение: лента со стрелками */
+.ig-offers { margin: var(--space-7) 0 var(--space-6); }
+.ig-offers__t { margin: 0 0 var(--space-4); text-align: center; font-family: var(--font-heading); font-weight: var(--weight-bold); font-size: 32px; text-transform: uppercase; color: var(--text-default); }
+.ig-offers__wrap { display: flex; align-items: center; gap: var(--space-3); }
+.ig-offers__arrow { flex: none; display: grid; place-items: center; width: 32px; height: 56px; padding: 0; border: 0; background: none; color: var(--text-heading); cursor: pointer; }
+.ig-offers__arrow svg { width: 24px; height: 48px; fill: none; stroke: currentColor; stroke-width: 3; }
+.ig-offers__arrow:disabled { opacity: .25; cursor: default; }
+.ig-offers__track { flex: 1; display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 4 * var(--space-4)) / 5); gap: var(--space-4); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.ig-offers__track::-webkit-scrollbar { display: none; }
+.ig-offers__track > li { scroll-snap-align: start; }
+.ig-offer { display: flex; align-items: center; gap: var(--space-2); color: var(--text-heading); }
+.ig-offer img { flex: none; width: 46%; height: auto; }
+.ig-offer__txt { display: flex; flex-direction: column; min-width: 0; }
+.ig-offer__brand { font-family: var(--font-heading); font-weight: var(--weight-semibold); font-size: 24px; line-height: 1.1; }
+.ig-offer__big { font-family: var(--font-heading); font-weight: var(--weight-bold); font-size: 44px; line-height: 1; }
+.ig-offer__name { margin-top: var(--space-1); font-size: 14px; line-height: 1.2; color: var(--text-default); }
+.ig-offer:hover .ig-offer__brand { color: var(--text-link); }
+
+@media (max-width: 1100px) {
+  .ig-dispo { grid-template-columns: 1fr; padding-left: 0; }
+  .ig-offers__track { grid-auto-columns: calc((100% - 2 * var(--space-4)) / 3); }
+  .ig-cat__t, .ig-dispo__t, .ig-offers__t { font-size: 26px; }
+  .ig-promo__t { font-size: 16px; }
+}
+@media (max-width: 767px) {
+  .ig-home__top { grid-template-columns: 1fr 1fr; gap: var(--space-3); margin: var(--space-3) 0; }
+  .ig-promo { aspect-ratio: 1; padding: var(--space-2) var(--space-2) var(--space-3); }
+  .ig-promo__t { font-size: 14px; }
+  .ig-cats { grid-template-columns: 1fr; gap: var(--space-3); margin: var(--space-3) 0; }
+  .ig-cat { min-height: 0; }
+  .ig-cat__body { max-width: 60%; padding: var(--space-3); }
+  .ig-cat__t, .ig-dispo__t, .ig-offers__t { font-size: 22px; }
+  .ig-cat__d { display: none; }
+  .ig-cat__go { font-size: 15px; }
+  .ig-dispo__list { grid-template-columns: repeat(3, 1fr); }
+  .ig-dispo__list .ig-banner { --cb-inset: var(--space-2); }
+  .ig-offers__track { grid-auto-columns: 80%; }
+  .ig-home__strip { font-size: 14px; }
+}
