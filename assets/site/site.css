@@ -1,0 +1,149 @@
+/* ==========================================================================
+   IGRObeauty — главная сайта (index.html, v8, 24.11.2026) по макету Figma «1. Main Final» → главная v4 (3592:252).
+   Поверх ДС и styles.css каталога: шапка, мега-меню и корзина – общие с каталогом.
+   Контент по сетке главной – 1200 px (контейнер 1280 с полями 40).
+   ========================================================================== */
+.site-home .ig-container { max-width: 1280px; }
+.site-home { background: var(--surface-card); }
+.site-main { padding-top: var(--mast-h, 0px); }
+.site-sec { margin: 0 auto; }
+.site-h2 {
+  margin: 0 0 var(--space-6);
+  font-family: var(--font-heading);
+  font-weight: var(--weight-semibold);
+  font-size: 26px;
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+  color: #111111;
+}
+
+/* строка доставки – как на главной каталога */
+.site-home .ig-home__strip { margin-top: var(--space-4); }
+
+/* два больших баннера */
+.site-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 22px; }
+.site-hero a, .site-promo a { display: block; overflow: hidden; border-radius: 8px; }
+.site-hero img, .site-promo img { display: block; width: 100%; height: auto; transition: transform var(--duration-base) var(--ease-standard); }
+@media (hover: hover) {
+  .site-hero a:hover img, .site-promo a:hover img { transform: scale(1.02); }
+}
+
+/* преимущества */
+.site-adv { display: flex; justify-content: space-between; align-items: center; margin: 30px 0; padding: 0 4px; }
+.site-adv__item { display: flex; align-items: center; gap: 14px; font-family: var(--font-heading); font-weight: var(--weight-semibold); font-size: 24px; text-transform: uppercase; color: #212121; }
+.site-adv__item img { display: block; height: 40px; width: auto; }
+
+/* три баннера акций */
+.site-promo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+/* рекомендуемые категории */
+.site-cats { margin-top: 48px; }
+.site-cats__grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 24px 20px; list-style: none; margin: 0; padding: 0; }
+.site-cat { display: flex; flex-direction: column; align-items: center; gap: 10px; text-decoration: none; color: #212121; }
+.site-cat__img { width: 160px; height: 160px; object-fit: contain; transition: transform var(--duration-base) var(--ease-standard); }
+.site-cat__t { font-size: var(--font-size-body-sm); font-weight: var(--weight-semibold); text-align: center; }
+@media (hover: hover) {
+  .site-cat:hover .site-cat__img { transform: translateY(-4px); }
+  .site-cat:hover .site-cat__t { color: var(--text-link); }
+}
+
+/* наши бренды – рамка, текст слева, 8 логотипов справа */
+.site-brands {
+  display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 32px;
+  margin-top: 56px; padding: 38px 30px 38px 44px;
+  border: 2px solid #50a27b; border-radius: 8px; background: var(--surface-page);
+}
+.site-brands .site-h2 { text-align: left; margin-bottom: 14px; }
+.site-brands__txt { margin: 0; font-size: 15px; line-height: 1.4; color: var(--text-muted); }
+.site-brands__grid { display: grid; grid-template-columns: repeat(4, 200px); gap: 8px; justify-content: end; list-style: none; margin: 0; padding: 0; }
+.site-brands__grid a { display: block; border-radius: 8px; overflow: hidden; transition: box-shadow var(--duration-fast) ease; }
+.site-brands__grid img { display: block; width: 200px; height: 91px; }
+@media (hover: hover) { .site-brands__grid a:hover { box-shadow: 0 0 0 2px #50a27b; } }
+
+/* бренды-партнёры – лента со стрелками и кнопка */
+.site-partners { margin-top: 48px; text-align: center; }
+.site-partners__row { display: flex; align-items: center; gap: 22px; }
+.site-partners__track { display: flex; gap: 16px; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; flex: 1; }
+.site-partners__track::-webkit-scrollbar { display: none; }
+.site-partners__track a { flex: 0 0 200px; }
+.site-partners__track img { display: block; width: 200px; height: 79px; }
+.site-arrow { flex: none; width: 29px; height: 50px; padding: 0; border: 0; background: none; color: #335351; cursor: pointer; }
+.site-arrow svg { width: 29px; height: 50px; }
+.site-partners .igro-btn { margin-top: 22px; }
+
+/* новости */
+.site-news { margin-top: 56px; padding: 40px 0 64px; background: var(--surface-page); }
+.site-news__tags { display: flex; justify-content: center; gap: 16px; margin: -12px 0 32px; }
+.site-tag { height: 35px; padding: 0 20px; border: 1px solid #d6dbde; border-radius: 9999px; background: #fff; font: inherit; font-size: var(--font-size-body-sm); color: #212121; cursor: pointer; }
+.site-tag[aria-pressed="true"] { background: #335351; border-color: #335351; color: #fff; }
+.site-news__grid { display: grid; grid-template-columns: repeat(4, 264px); justify-content: space-between; list-style: none; margin: 0; padding: 0; }
+.site-card { display: flex; flex-direction: column; gap: 8px; padding: 12px 12px 20px; border-radius: 4px; text-decoration: none; color: #212121; }
+.site-card img { display: block; width: 240px; height: 265px; object-fit: cover; border-radius: 8px; }
+.site-card__meta { display: flex; justify-content: space-between; margin-top: 4px; font-size: 13px; }
+.site-card__cat { color: #8c6a26; }
+.site-card__date { color: var(--text-muted); }
+.site-card__t { font-family: var(--font-heading); font-weight: var(--weight-semibold); font-size: 16px; line-height: 1.3; }
+@media (hover: hover) { .site-card:hover { background: #fff; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); } }
+
+/* программа лояльности и вход – по блоку igrobeauty.ru, в палитре DS 3.2 */
+.site-loyal { padding: 48px 0; background: var(--surface-page); }
+.site-loyal__card { display: grid; grid-template-columns: 670px 1fr; max-width: 1180px; margin: 0 auto; border: 1px solid #e7e7e7; background: #fff; }
+.site-loyal__left { position: relative; padding: 32px 32px 28px; background: #edebe9; }
+.site-loyal__left h2 { margin: 0 0 30px; max-width: 460px; font-family: var(--font-heading); font-weight: 800; font-size: 32px; line-height: 1.15; color: #335351; }
+.site-loyal__gift { position: absolute; right: 0; top: 0; width: 200px; }
+.site-perks { list-style: none; margin: 0 0 30px; padding: 0; display: grid; gap: 16px; }
+.site-perks li { display: flex; align-items: center; gap: 18px; font-size: 16px; }
+.site-perks li > span { display: block; }
+.site-perks img { width: 28px; height: 28px; }
+.site-loyal__btn, .site-login__btn { display: inline-flex; align-items: center; justify-content: center; gap: 12px; height: 49px; padding: 0 24px; border: 1px solid #335351; border-radius: 4px; background: #335351; color: #fff; font: inherit; font-weight: var(--weight-semibold); font-size: 15px; text-decoration: none; cursor: pointer; }
+.site-loyal__btn { width: 400px; }
+.site-login { padding: 32px; }
+.site-login h2 { margin: 0 0 6px; font-family: var(--font-heading); font-weight: var(--weight-bold); font-size: 23px; line-height: 1.25; color: #212121; }
+.site-login p { margin: 0 0 30px; color: var(--text-muted); font-size: 15px; }
+.site-login__field { position: relative; margin-bottom: 20px; }
+.site-login__field input { width: 100%; height: 53px; padding: 0 16px; border: 1px solid #d6dbde; border-radius: 2px; font: inherit; font-size: 15px; }
+.site-login__field img { position: absolute; right: 16px; top: 16px; width: 22px; opacity: .55; }
+.site-login__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; }
+.site-login__btn--line { background: #fff; color: #335351; }
+.site-stats { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #e7e7e7; }
+.site-stats li { display: flex; align-items: center; gap: 18px; padding: 26px 28px; list-style: none; }
+.site-stats li + li { border-left: 1px solid #e7e7e7; }
+.site-stats__ic { display: grid; place-items: center; width: 60px; height: 60px; border-radius: 4px; background: #d6e9e7; }
+.site-stats b { display: block; font-family: var(--font-heading); font-weight: var(--weight-bold); font-size: 19px; color: #212121; }
+.site-stats span { font-size: 14px; color: var(--text-muted); }
+.site-stats ul, ul.site-stats { margin: 0; padding: 0; }
+
+/* подвал – по схеме footer-wireframe.html (24.11), классы .ft как в схеме */
+.ft { background: #335351; color: #fff; font-family: var(--font-ui); }
+.ft a { color: inherit; text-decoration: none; }
+.ft__in { max-width: 1280px; margin: 0 auto; padding: 0 40px; }
+.ft__main { display: grid; grid-template-columns: 1.5fr repeat(4, 1fr); gap: 40px; padding: 48px 0 40px; }
+.ft__contact { padding-right: 32px; border-right: 1px solid rgba(255,255,255,.12); }
+.ft__eyebrow { margin: 0 0 12px; font-family: var(--font-heading); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.7); }
+.ft__phone { display: block; font-family: var(--font-heading); font-weight: 700; font-size: 24px; line-height: 1.3; }
+.ft__hours { margin: 8px 0 16px; font-size: 15px; color: rgba(255,255,255,.7); }
+.ft__msg { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.ft__chip { display: inline-flex; align-items: center; height: 44px; padding: 0 10px; border: 1px solid rgba(255,255,255,.4); border-radius: 4px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+.ft__chip--solid { background: #fff; color: #335351 !important; border-color: #fff; }
+.ft__line { margin: 4px 0; font-size: 15px; }
+.ft__line span { color: rgba(255,255,255,.7); }
+.ft__line a { text-decoration: underline; text-underline-offset: 3px; }
+.ft__col h3 { margin: 0 0 16px; font-family: var(--font-heading); font-weight: 700; font-size: 16px; white-space: nowrap; }
+.ft__col ul { list-style: none; margin: 0; padding: 0; }
+.ft__col li { margin: 0 0 12px; font-size: 15px; line-height: 1.35; }
+.ft__col li a { color: rgba(255,255,255,.7); }
+.ft__col li.is-key a { color: #fff; font-weight: 600; }
+.ft__col li.is-club a { color: #dfc49d; font-weight: 600; }
+.ft__col li.is-minor a { font-size: 14px; }
+@media (hover: hover) { .ft__col li a:hover, .ft__soc:hover { color: #fff !important; text-decoration: underline; text-underline-offset: 3px; } }
+.ft__social { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 0; border-top: 1px solid rgba(255,255,255,.12); font-size: 15px; }
+.ft__social-txt { color: rgba(255,255,255,.7); }
+.ft__social-list { display: flex; gap: 8px; }
+.ft__soc { display: inline-flex; align-items: center; height: 36px; padding: 0 12px; border: 1px solid rgba(255,255,255,.12); border-radius: 4px; color: rgba(255,255,255,.7) !important; font-size: 14px; }
+.ft__legal { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 32px; padding: 20px 0 28px; border-top: 1px solid rgba(255,255,255,.12); font-size: 13px; color: rgba(255,255,255,.7); }
+.ft__legal nav { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.ft__legal a { text-decoration: underline; text-underline-offset: 3px; }
+.ft__pro { max-width: 440px; }
+.site-home .ig-proto { color: rgba(255,255,255,.55); background: #335351; }
+.site-home .ig-proto a, .site-home .ig-proto button { color: rgba(255,255,255,.8); }

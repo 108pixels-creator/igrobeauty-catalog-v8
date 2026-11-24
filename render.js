@@ -558,7 +558,7 @@
   /* ---------- шапка страницы: крошки, заголовок, ссылки на разделы ---------- */
   var chain = [];
   for (var cur = node; cur; cur = D.nodes[cur.parent]) chain.unshift(cur);
-  var trail = [{ t: 'Главная', href: 'index.html' }].concat(chain.map(function (c) {
+  var trail = [{ t: 'Главная', href: 'index.html' }, { t: 'Каталог', href: 'catalog.html' }].concat(chain.map(function (c) {
     return { t: c.title, href: c.href, cur: c === node };
   }));
   /* Breadcrumb ДС: прежние шаги — ссылки, текущая страница — igro-crumbs__current с aria-current */
@@ -627,15 +627,15 @@
   html += '<section class="ig-toolbar"><div class="ig-toolbar__panel" data-tbpanel><div class="ig-container">' +
     '<div class="ig-toolbar__row" id="ig-tb"></div><div id="ig-qf"></div></div></div></section>' +
     '<main class="ig-content"><div class="ig-container" id="ig-content"></div></main>';
-  /* главная (index.html, 03.11): разметка страницы своя, в index.html; отсюда – только меню, подвал и корзина */
+  /* главная каталога (catalog.html) и главная сайта (index.html, v8): разметка своя; отсюда – только меню, подвал и корзина */
   if (!HOME) document.getElementById('page').innerHTML = html;
 
   /* логотип ведёт на главную и сохраняет режим карточек */
   var logo = document.querySelector('.ig-logo');
   if (logo) logo.setAttribute('href', link('index.html'));
-  /* «Каталог» в меню – тоже на главную (03.11) */
+  /* «Каталог» в меню – на главную каталога (v8, 24.11: index.html – главная сайта, главная каталога – catalog.html) */
   var catLink = document.querySelector('[data-toggle="mega"]');
-  if (catLink) catLink.setAttribute('href', link('index.html'));
+  if (catLink) catLink.setAttribute('href', link('catalog.html'));
 
   /* ---------- подвал: категории и служебная строка прототипа ---------- */
   var footNav = document.getElementById('ig-footer-nav');
@@ -1529,6 +1529,11 @@
     }
   });
 
+  /* бренд из адреса (?brand=NIRVEL PROFESSIONAL) – ссылки с главной сайта (v8, 24.11): фильтр по бренду в разделе */
+  (function () {
+    var b = params.get('brand');
+    if (b && ORDER.g.indexOf(b) > -1) sel.g = [b];
+  })();
   /* открыта ссылка на раскрытый продукт */
   (function () {
     var k = params.get('product'), c = k && cardByKey['p' + k];
