@@ -469,8 +469,10 @@
     var D = window.IG_DATA;
     var mq = window.matchMedia('(max-width: 767px)');
     if (!D || !D.nodes || !document.querySelector('[data-mburger]')) return;
-    var sku = new URLSearchParams(location.search).get('cards') === 'sku';
-    var href = function (h) { return !h || h === '#' || !sku ? (h || '#') : h + (h.indexOf('?') > -1 ? '&' : '?') + 'cards=sku'; };
+    var q = new URLSearchParams(location.search), keep = [];
+    if (q.get('cards') === 'sku') keep.push('cards=sku');
+    ['mf', 'mfs'].forEach(function (k) { if (q.get(k)) keep.push(k + '=' + encodeURIComponent(q.get(k))); });
+    var href = function (h) { return !h || h === '#' || !keep.length ? (h || '#') : h + (h.indexOf('?') > -1 ? '&' : '?') + keep.join('&'); };
     var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
     /* разделы – подписи и порядок как в полосе категорий и в макете C-4 */
     var CATS = [['Для волос', 'hair'], ['Депиляция', 'depilation'], ['Брови и ресницы', 'brows'], ['Косметология', 'cosmetology'],

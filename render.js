@@ -156,13 +156,22 @@
   var params = new URLSearchParams(location.search);
   /* карточка каталога — продукт; ?cards=sku показывает прежнюю логику «карточка на каждый артикул» */
   var MODE = params.get('cards') === 'sku' ? 'sku' : 'product';
+  /* варианты панели фильтров на телефоне (этап 5, 24.11) – см. phoneToolbar() */
+  var MF = /^[abc]$/.test(params.get('mf') || '') ? params.get('mf') : '';
+  var phoneMQ = window.matchMedia('(max-width: 767px)');
+  if (MF) document.body.classList.add('ig-mf', 'ig-mf-' + MF);
+  if (params.get('mfs') === '1') document.body.classList.add('ig-mfs');
   /* затемнение фото: по умолчанию круговой градиент с белым кругом до половины радиуса;
      ?shade=soft – градиент от самого центра, ?shade=flat – прежнее ровное (сравнение, 23.10) */
   if (/^(soft|flat)$/.test(params.get('shade') || '')) document.body.classList.add('ig-shade-' + params.get('shade'));
   function link(href) {
     if (!href) return '#';
-    if (MODE !== 'sku') return href;
-    return href + (href.indexOf('?') > -1 ? '&' : '?') + 'cards=sku';
+    /* режим карточек и варианты панели фильтров (?mf, ?mfs) сохраняются при переходах */
+    var keep = [];
+    if (MODE === 'sku') keep.push('cards=sku');
+    ['mf', 'mfs'].forEach(function (k) { var v = params.get(k); if (v) keep.push(k + '=' + encodeURIComponent(v)); });
+    if (!keep.length || href === '#') return href;
+    return href + (href.indexOf('?') > -1 ? '&' : '?') + keep.join('&');
   }
   /* картинки товаров — ссылки на сайт igrobeauty.ru («Картинка для анонса» из выгрузки Битрикса 12.10.2026),
      сами файлы в прототип не скачиваются. Оригиналы — 1000×1000 и до 0,5 МБ, поэтому в карточку картинка идёт
@@ -818,8 +827,62 @@
         '<button type="button" class="ig-tlink ig-tlink--more" data-open="filters" data-focus="y" aria-haspopup="dialog" hidden></button></div></div>';
     }
     document.getElementById('ig-qf').innerHTML = rows ? '<div class="ig-qf">' + rows + '</div>' : '';
+    if (MF && phoneMQ.matches) phoneToolbar();
     /* обрезка до двух строк — после того, как script.js выровняет подписи строк (ширина колонки меняется) */
     requestAnimationFrame(clampRows);
+  }
+
+  /* ---------- панель фильтров на телефоне: варианты для выбора (этап 5, 24.11) ----------
+     ?mf=a – «одна лента»: «Фильтры», бренды и типы продукта чипами в одной строке, листается вбок; ниже счётчик и сортировка;
+     ?mf=b – «две кнопки»: «Фильтры» и сортировка пополам на всю ширину; ниже лента чипов брендов и типов;
+     ?mf=c – «минимум»: счётчик, сортировка и «Фильтры» одной строкой; чипы – только выбранные, лентой под ней.
+     Во всех вариантах типы продукта – чипами в ленте, отдельной строки ссылок нет; отступы над сеткой меньше.
+     Без параметра – как было (для сравнения). ?mfs=1 – лист фильтров шторкой снизу, как меню телефона */
+  function phoneToolbar() {
+    var row = document.querySelector('#ig-tb');
+    var left = row.querySelector('.ig-toolbar__left'), right = row.querySelector('.ig-toolbar__right');
+    var fbtn = left.querySelector('.ig-filters-btn');
+    /* типы продукта – чипами; одна подпись без выбора – не нужна */
+    var types = Array.prototype.slice.call(document.querySelectorAll('#ig-qf .ig-typelist .ig-tlink:not(.ig-tlink--more)'));
+    types.forEach(function (t) { t.classList.add('ig-tchip'); });
+    var typeRow = document.querySelector('#ig-qf .ig-qf__row--text');
+    if (typeRow) typeRow.parentNode.removeChild(typeRow);
+    var qf = document.querySelector('#ig-qf .ig-qf');
+    if (qf && !qf.children.length) qf.parentNode.removeChild(qf);
+    /* лента прошлой отрисовки стоит рядом с #ig-tb, а не внутри – убрать, иначе их станет две */
+    Array.prototype.forEach.call(row.parentNode.querySelectorAll(':scope > .ig-mf-line'), function (el) { el.parentNode.removeChild(el); });
+    var isOn = function (el) { return el.getAttribute('aria-pressed') === 'true' || !!el.querySelector('.igro-tag__remove') || el.classList.contains('igro-tag--selected'); };
+    /* выбранное и чипы с крестиком – первыми в ленте, чтобы их было видно без прокрутки */
+    var chips = Array.prototype.slice.call(left.children).filter(function (el) { return el !== fbtn; });
+    chips = chips.filter(isOn).concat(chips.filter(function (el) { return !isOn(el); }));
+    types = types.filter(isOn).concat(types.filter(function (el) { return !isOn(el); }));
+    var line = document.createElement('div');
+    line.className = 'ig-mf-line';
+    var fill = function (list) {
+      list.forEach(function (el) { line.appendChild(el); });
+      if (types.length) {
+        if (list.length) line.insertAdjacentHTML('beforeend', '<span class="ig-mf-sep" aria-hidden="true"></span>');
+        types.forEach(function (t) { line.appendChild(t); });
+      }
+    };
+    if (MF === 'a') {
+      line.appendChild(fbtn);
+      fill(chips);
+      left.appendChild(line);
+    } else if (MF === 'b') {
+      var sw = right.querySelector('.ig-sortwrap');
+      left.appendChild(sw);
+      fill(chips);
+      if (line.children.length) row.parentNode.insertBefore(line, row.nextSibling);
+    } else {
+      /* c: выбранные бренды и чипы с крестиком – лентой; невыбранные бренды и типы – только в листе фильтров */
+      var on = chips.filter(isOn);
+      on.forEach(function (el) { line.appendChild(el); });
+      types.filter(function (t) { return t.getAttribute('aria-pressed') === 'true'; }).forEach(function (t) { line.appendChild(t); });
+      chips.forEach(function (el) { if (el.parentNode === left) el.parentNode.removeChild(el); });
+      right.appendChild(fbtn);
+      if (line.children.length) row.parentNode.insertBefore(line, row.nextSibling);
+    }
   }
 
   /* ---------- контент ---------- */
@@ -1083,7 +1146,9 @@
       if (chips[i].getAttribute('aria-pressed') !== 'true') chips[i].hidden = true;
     }
   }
+  phoneMQ.addEventListener('change', function () { if (MF && document.getElementById('ig-tb')) renderToolbar(); });
   function clampRows() {
+    if (MF && phoneMQ.matches) return;   /* варианты панели на телефоне – ленты листаются, ничего не прячется */
     clampBrands();
     var types = document.querySelector('.ig-qf [data-clamp="y"]');
     if (types) clampRow(types, types.querySelector('.ig-tlink--more'), function (n) { return 'ещё (' + n + ')'; });
