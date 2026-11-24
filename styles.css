@@ -2132,3 +2132,112 @@ body.igro[data-page="home"] .ig-footer { margin-top: 76px; }
   .ig-tabbar .ig-cart__sum:not([hidden]) + .ig-tabbar__empty { display: none; }
 }
 @keyframes ig-msearch-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* ==========================================================================
+   МЕНЮ ТЕЛЕФОНА (v8, 24.11.2026) – Figma 3655:30226, экраны C-3 «Меню», C-4 «Каталог», C-5 переход, C-6 раздел.
+   Шторка: белая, скругление сверху 28 px, ручка 40 × 5 #D6D6D2, подложка House #335351 45 %.
+   Заголовок 22 px Montserrat Bold, крестик – круг 44 px #F1F1EF. Плитки 175 × 64, скругление 14, #F1F1EF,
+   «Каталог» – House с белым текстом. Строки каталога 59 px, разделов 50 px, прописные 14 px Montserrat Bold,
+   линия #EEE, «›» #AAA; «Все товары раздела» – акцент #3C8883. Внизу – «Работаем с профессионалами» плашкой 52 px.
+   Разметку и переходы делает script.js (блок «меню телефона»)
+   ========================================================================== */
+.ig-msheet { position: fixed; inset: 0; z-index: var(--z-overlay); }
+.ig-msheet[hidden] { display: none; }
+.has-msheet, .has-msheet body { overflow: hidden; }
+.ig-msheet__scrim {
+  position: absolute; inset: 0;
+  background: rgba(51, 83, 81, 0.45);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.ig-msheet__panel {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  top: 56px;
+  display: flex; flex-direction: column;
+  border-radius: 28px 28px 0 0;
+  background: var(--surface-card);
+  box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.08), 0 -1px 2px rgba(0, 0, 0, 0.08);
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+  touch-action: pan-y;
+}
+.ig-msheet.is-open .ig-msheet__scrim { opacity: 1; }
+.ig-msheet.is-open .ig-msheet__panel { transform: translateY(0); }
+.ig-msheet__panel.is-dragging { transition: none; }
+.ig-msheet__grab { flex: none; width: 40px; height: 5px; margin: 10px auto 0; border-radius: 3px; background: #d6d6d2; }
+.ig-msheet__views { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; }
+.ig-msheet__view {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  background: var(--surface-card);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s;
+}
+.ig-msheet__view.is-left { transform: translateX(-100%); visibility: hidden; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s 0.3s; }
+.ig-msheet__view.is-right { transform: translateX(100%); }
+
+.ig-msheet__head { flex: none; display: flex; align-items: center; gap: 6px; min-height: 56px; padding: 14px 16px 6px; cursor: grab; }
+.ig-msheet__title { flex: 1 1 auto; min-width: 0; margin: 0; font-family: var(--font-heading); font-weight: var(--weight-bold); font-size: 22px; line-height: 27px; color: #1a1a1a; }
+.ig-msheet__back, .ig-msheet__close {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; padding: 0; border: 0; border-radius: 22px; cursor: pointer; color: #111111;
+}
+.ig-msheet__back { margin-left: 8px; background: none; }
+.ig-msheet__close { background: #f1f1ef; }
+.ig-msheet__body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 8px 16px 16px; display: flex; flex-direction: column; }
+
+.ig-msheet__login {
+  display: flex; align-items: center; gap: 12px;
+  min-height: 58px; padding: 0 16px; box-sizing: border-box;
+  border: 1px solid #e7e7e7; border-radius: 12px;
+  font-family: var(--font-body); font-weight: var(--weight-bold); font-size: 16px; letter-spacing: -0.01em;
+  color: #212121; text-decoration: none;
+}
+.ig-msheet__login span { flex: 1 1 auto; }
+.ig-msheet__login svg:last-child { color: #6b6b6b; }
+.ig-msheet__tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+.ig-msheet__tile {
+  display: flex; align-items: center; gap: 16px;
+  min-height: 64px; padding: 0 14px; box-sizing: border-box;
+  border: 0; border-radius: 14px; background: #f1f1ef; cursor: pointer;
+  font-family: var(--font-heading); font-weight: var(--weight-bold); font-size: 12.5px; line-height: 15px;
+  text-transform: uppercase; text-align: left; color: #1a1a1a; text-decoration: none;
+}
+.ig-msheet__tile--main { padding-left: 20px; background: #335351; color: #fff; }
+.ig-msheet__contacts { margin-top: auto; padding-top: 24px; display: flex; flex-direction: column; gap: 8px; }
+.ig-msheet__pill {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 52px; padding: 0 20px; box-sizing: border-box; border-radius: 26px;
+  background: #335351; color: #fff; text-decoration: none;
+  font-family: var(--font-heading); font-weight: var(--weight-bold); font-size: 13px; text-transform: uppercase;
+}
+.ig-msheet__pill--phone { font-family: var(--font-body); font-size: 16px; text-transform: none; }
+.ig-msheet__addr { margin: 4px 0 0; text-align: center; font-family: var(--font-body); font-size: 13px; color: #555555; }
+
+.ig-msheet__list { list-style: none; margin: 0; padding: 0 16px; }
+.ig-msheet__row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  width: 100%; min-height: 50px; padding: 0; box-sizing: border-box;
+  border: 0; border-bottom: 1px solid #eeeeee; background: none; cursor: pointer; text-align: left;
+  font-family: var(--font-heading); font-weight: var(--weight-bold); font-size: 14px; line-height: 17px;
+  text-transform: uppercase; color: #1a1a1a; text-decoration: none;
+}
+.ig-msheet__list--cats .ig-msheet__row { min-height: 59px; }
+.ig-msheet__row--accent { color: #3c8883; }
+.ig-msheet__chev { flex: none; font-family: var(--font-heading); font-weight: 400; font-size: 22px; line-height: 1; color: #aaaaaa; }
+.ig-msheet__foot { flex: none; padding: 12px 16px calc(30px + env(safe-area-inset-bottom, 0px)); }
+@media (hover: hover) {
+  .ig-msheet__row:hover { color: #3c8883; }
+  .ig-msheet__tile:not(.ig-msheet__tile--main):hover { background: #e6e6e3; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ig-msheet__panel, .ig-msheet__view, .ig-msheet__scrim { transition: none; }
+}
+@media (min-width: 768px) {
+  .ig-msheet { display: none; }
+}
+
+/* полоса категорий: ссылки нажимаются по всей высоте полосы (аудит 24.11), уведомления – под видимой шапкой */
+@media (max-width: 767px) {
+  .ig-mcats a { display: flex; align-items: center; height: 44px; }
+  .igro-toast-region--top { top: calc(var(--mhead-b, 186px) + 8px); left: 12px; right: 12px; width: auto; transition: top 0.25s ease-in-out; }
+}

@@ -70,8 +70,6 @@
     megaEl.classList.toggle('is-open', open);
     megaEl.setAttribute('aria-hidden', open ? 'false' : 'true');
     if (catalogBtn) catalogBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    var mburger = document.querySelector('[data-mburger]');
-    if (mburger) mburger.setAttribute('aria-expanded', open ? 'true' : 'false');
     if (!open) megaByHover = false;
   }
 
@@ -88,9 +86,6 @@
     /* «Каталог» (03.11) – ссылка на главную каталога: клик ведёт туда, меню раскрывается наведением
        (с клавиатуры – стрелкой вниз) */
     if (t.closest('[data-toggle="mega"]')) return;
-    /* бургер шапки телефона (v8, 24.11) – пока открывает каталог во весь экран; своё меню бургера – этап 4 */
-    var burger = t.closest('[data-mburger]');
-    if (burger) { setMega(!megaOpen()); return; }
     if (t.closest('[data-mega-close]')) { setMega(false); if (catalogBtn) catalogBtn.focus(); return; }
     if (megaOpen() && !t.closest('#mega')) setMega(false);
     var catBtn = t.closest('.ig-mega__cat');
@@ -428,6 +423,8 @@
       }
       lastY = y;
       placeTb();
+      /* низ видимой шапки – под ним на телефоне встают уведомления (v8, 24.11) */
+      docEl.style.setProperty('--mhead-b', Math.round(mastBottom()) + 'px');
     };
     window.addEventListener('scroll', function () {
       if (!mastTick) { mastTick = true; requestAnimationFrame(onMastScroll); }
@@ -463,4 +460,208 @@
     window.addEventListener('resize', offArrows);
     offArrows();
   }
+  /* ---------- меню телефона (v8, 24.11.2026) – Figma 3655:30226, экраны C-3…C-6 ----------
+     Шторка снизу на подложке House 45 %: «Меню» (вход, плитки разделов сайта, телефоны) → «Каталог» (разделы) →
+     раздел («Все товары раздела» и подкатегории) → подкатегория («Все товары подкатегории» и группы).
+     Следующий экран въезжает справа, предыдущий уходит влево (C-5); «‹» – назад. Закрывают крестик, подложка,
+     Esc и свайп шторки вниз. Открывают бургер (экран «Меню») и «Каталог» в полосе категорий (сразу «Каталог») */
+  (function () {
+    var D = window.IG_DATA;
+    var mq = window.matchMedia('(max-width: 767px)');
+    if (!D || !D.nodes || !document.querySelector('[data-mburger]')) return;
+    var sku = new URLSearchParams(location.search).get('cards') === 'sku';
+    var href = function (h) { return !h || h === '#' || !sku ? (h || '#') : h + (h.indexOf('?') > -1 ? '&' : '?') + 'cards=sku'; };
+    var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+    /* разделы – подписи и порядок как в полосе категорий и в макете C-4 */
+    var CATS = [['Для волос', 'hair'], ['Депиляция', 'depilation'], ['Брови и ресницы', 'brows'], ['Косметология', 'cosmetology'],
+      ['Ногтевой сервис', 'nails'], ['Загар', 'tanning'], ['Одноразовая продукция', 'disposable'], ['Дезинфекция', 'disinfection']];
+    var catLabel = {};
+    CATS.forEach(function (c) { catLabel[c[1]] = c[0]; });
+    /* разделы сайта – из строки меню десктопа (Акции … Контакты) */
+    var siteLinks = Array.prototype.map.call(document.querySelectorAll('.ig-mainnav__list--end .ig-navlink'), function (a) {
+      return [a.textContent.trim(), a.getAttribute('href') || '#'];
+    });
+    var tel = Array.prototype.map.call(document.querySelectorAll('.ig-topbar__contacts a[href^="tel:"]'), function (a) { return a.textContent.trim(); });
+    var PHONES = ['+7 (495) 109-33-33', '+7 (495) 988-58-59'];   /* как в макете C-3 (в плашке десктопа – первый номер дважды) */
+    if (tel[0]) PHONES[0] = tel[0];
+    var addrEl = document.querySelector('.ig-topbar__contacts > span');
+    var ADDR = addrEl ? addrEl.textContent.trim().replace(/\.$/, '') : 'Москва, ул. Мельникова д.3к2';
+    var PRO = document.querySelector('.ig-home__pro');
+    var PRO_HREF = PRO ? PRO.getAttribute('href') : '#';
+
+    var SVG_X = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>';
+    var SVG_BACK = '<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M12.5 4l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+    var SVG_USER = '<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><circle cx="10" cy="6.5" r="3.5" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M3.5 17.5c.8-3.3 3.4-5 6.5-5s5.7 1.7 6.5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg>';
+    var SVG_RIGHT = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M6 3.5l4.5 4.5L6 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+    var SVG_GRID = '<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><rect width="5" height="5" rx="1" fill="currentColor"/><rect x="7" width="5" height="5" rx="1" fill="currentColor"/><rect y="7" width="5" height="5" rx="1" fill="currentColor"/><rect x="7" y="7" width="5" height="5" rx="1" fill="currentColor"/></svg>';
+    var CHEV = '<span class="ig-msheet__chev" aria-hidden="true">›</span>';
+
+    var sheet = document.createElement('div');
+    sheet.className = 'ig-msheet';
+    sheet.hidden = true;
+    sheet.innerHTML = '<div class="ig-msheet__scrim" data-msheet-close></div>' +
+      '<div class="ig-msheet__panel" role="dialog" aria-modal="true" aria-label="Меню">' +
+      '<div class="ig-msheet__grab" aria-hidden="true"></div><div class="ig-msheet__views"></div></div>';
+    document.body.appendChild(sheet);
+    var panel = sheet.querySelector('.ig-msheet__panel');
+    var viewsEl = sheet.querySelector('.ig-msheet__views');
+    var stack = [];   /* [{ key, el }] */
+    var opener = null;
+
+    var head = function (title, back) {
+      return '<div class="ig-msheet__head">' +
+        (back ? '<button type="button" class="ig-msheet__back" data-msheet-back aria-label="Назад">' + SVG_BACK + '</button>' : '') +
+        '<h2 class="ig-msheet__title">' + esc(title) + '</h2>' +
+        '<button type="button" class="ig-msheet__close" data-msheet-close aria-label="Закрыть меню">' + SVG_X + '</button></div>';
+    };
+    var proBtn = '<div class="ig-msheet__foot"><a class="ig-msheet__pill" href="' + esc(PRO_HREF) + '">Работаем с профессионалами&nbsp;»</a></div>';
+    var row = function (label, opts) {
+      var cls = 'ig-msheet__row' + (opts.accent ? ' ig-msheet__row--accent' : '');
+      return opts.go
+        ? '<li><button type="button" class="' + cls + '" data-msheet-go="' + esc(opts.go) + '"><span>' + esc(label) + '</span>' + CHEV + '</button></li>'
+        : '<li><a class="' + cls + '" href="' + esc(href(opts.href)) + '"><span>' + esc(label) + '</span>' + CHEV + '</a></li>';
+    };
+    var build = function (key, back) {
+      var p = key.split(':'), html;
+      if (p[0] === 'menu') {
+        html = head('Меню', back) + '<div class="ig-msheet__body">' +
+          '<a class="ig-msheet__login" href="#">' + SVG_USER + '<span>Вход / Регистрация</span>' + SVG_RIGHT + '</a>' +
+          '<div class="ig-msheet__tiles">' +
+          '<button type="button" class="ig-msheet__tile ig-msheet__tile--main" data-msheet-go="catalog">' + SVG_GRID + '<span>Каталог</span></button>' +
+          siteLinks.map(function (l) { return '<a class="ig-msheet__tile" href="' + esc(l[1]) + '">' + esc(l[0]) + '</a>'; }).join('') +
+          '</div>' +
+          '<div class="ig-msheet__contacts">' +
+          PHONES.map(function (t) { return '<a class="ig-msheet__pill ig-msheet__pill--phone" href="tel:' + t.replace(/[^\d+]/g, '') + '">' + esc(t) + '</a>'; }).join('') +
+          '<p class="ig-msheet__addr">' + esc(ADDR) + '</p></div></div>';
+      } else if (p[0] === 'catalog') {
+        html = head('Каталог', back) + '<div class="ig-msheet__body"><ul class="ig-msheet__list ig-msheet__list--cats">' +
+          CATS.map(function (c) { return row(c[0], { go: 'cat:' + c[1] }); }).join('') + '</ul></div>' + proBtn;
+      } else {
+        var n = D.nodes[p[1]];
+        if (!n) return null;
+        var title = p[0] === 'cat' ? (catLabel[n.id] || n.title) : n.title;
+        html = head(title, back) + '<div class="ig-msheet__body"><ul class="ig-msheet__list">' +
+          row(p[0] === 'cat' ? 'Все товары раздела' : 'Все товары подкатегории', { href: n.href, accent: true }) +
+          (n.kids || []).map(function (id) {
+            var k = D.nodes[id];
+            if (!k) return '';
+            return (k.kids && k.kids.length) ? row(k.title, { go: 'sub:' + k.id }) : row(k.title, { href: k.href });
+          }).join('') + '</ul></div>' + proBtn;
+      }
+      var v = document.createElement('section');
+      v.className = 'ig-msheet__view';
+      v.setAttribute('data-key', key);
+      v.innerHTML = html;
+      return v;
+    };
+    var calm = function () { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; };
+    var focusIn = function (v) {
+      var f = v.querySelector('.ig-msheet__back') || v.querySelector('.ig-msheet__close');
+      if (f) f.focus({ preventScroll: true });
+    };
+    /* переход между экранами: новый справа, старый влево; назад – наоборот */
+    var push = function (key, instant) {
+      var v = build(key, stack.length > 0);
+      if (!v) return;
+      var prev = stack.length ? stack[stack.length - 1].el : null;
+      viewsEl.appendChild(v);
+      stack.push({ key: key, el: v });
+      panel.setAttribute('aria-label', v.querySelector('.ig-msheet__title').textContent);
+      if (!prev || instant || calm()) {
+        if (prev) prev.classList.add('is-left');
+        focusIn(v);
+        return;
+      }
+      v.classList.add('is-right');
+      v.getBoundingClientRect();
+      v.classList.remove('is-right');
+      prev.classList.add('is-left');
+      focusIn(v);
+    };
+    var pop = function () {
+      if (stack.length < 2) return;
+      var cur = stack.pop().el, prev = stack[stack.length - 1].el;
+      panel.setAttribute('aria-label', prev.querySelector('.ig-msheet__title').textContent);
+      prev.classList.remove('is-left');
+      var done = function () { if (cur.parentNode) cur.parentNode.removeChild(cur); };
+      if (calm()) done();
+      else { cur.classList.add('is-right'); cur.addEventListener('transitionend', done, { once: true }); setTimeout(done, 500); }
+      focusIn(prev);
+    };
+    var isOpen = function () { return !sheet.hidden && sheet.classList.contains('is-open'); };
+    var open = function (keys, from) {
+      if (!mq.matches) return;
+      opener = from || null;
+      /* уведомления закрываются – иначе ложатся поверх меню */
+      Array.prototype.forEach.call(document.querySelectorAll('.igro-toast-region__item'), function (li) { li.remove(); });
+      viewsEl.innerHTML = '';
+      stack = [];
+      keys.forEach(function (k) { push(k, true); });
+      sheet.hidden = false;
+      panel.style.transform = '';
+      document.documentElement.classList.add('has-msheet');
+      sheet.getBoundingClientRect();
+      sheet.classList.add('is-open');
+      focusIn(stack[stack.length - 1].el);   /* фокус – когда шторка уже видна */
+      var b = document.querySelector('[data-mburger]');
+      if (b) b.setAttribute('aria-expanded', 'true');
+    };
+    var close = function (fromDrag) {
+      if (sheet.hidden) return;
+      sheet.classList.remove('is-open');
+      panel.style.transform = fromDrag === true ? 'translateY(100%)' : '';   /* после свайпа – вниз с того места, где отпустили */
+      document.documentElement.classList.remove('has-msheet');
+      var b = document.querySelector('[data-mburger]');
+      if (b) b.setAttribute('aria-expanded', 'false');
+      var hide = function () { if (!sheet.classList.contains('is-open')) sheet.hidden = true; };
+      if (calm()) hide(); else setTimeout(hide, 320);
+      if (opener) opener.focus({ preventScroll: true });
+    };
+
+    /* открытие – раньше остальных обработчиков (фаза перехвата): ссылка «Каталог» на телефоне не уводит на страницу */
+    document.addEventListener('click', function (e) {
+      var t = e.target;
+      var burger = t.closest('[data-mburger]');
+      if (burger) { e.preventDefault(); e.stopPropagation(); if (isOpen()) close(); else open(['menu'], burger); return; }
+      var cat = mq.matches && t.closest('.ig-mast [data-toggle="mega"]');
+      if (cat) { e.preventDefault(); e.stopPropagation(); open(['menu', 'catalog'], cat); }
+    }, true);
+    sheet.addEventListener('click', function (e) {
+      var t = e.target;
+      if (t.closest('[data-msheet-close]')) { close(); return; }
+      if (t.closest('[data-msheet-back]')) { pop(); return; }
+      var go = t.closest('[data-msheet-go]');
+      if (go) { push(go.getAttribute('data-msheet-go')); return; }
+      var a = t.closest('a[href]');
+      if (a && a.getAttribute('href') === '#') { e.preventDefault(); close(); }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && isOpen()) { e.stopPropagation(); if (stack.length > 1 && e.shiftKey) pop(); else close(); }
+    }, true);
+    mq.addEventListener('change', function () { if (!mq.matches) close(); });
+
+    /* свайп вниз за ручку и строку заголовка – шторка едет за пальцем; дальше 100 px или быстро – закрывается */
+    var drag = null;
+    panel.addEventListener('pointerdown', function (e) {
+      if (!e.target.closest('.ig-msheet__grab, .ig-msheet__head') || e.target.closest('button')) return;
+      drag = { y: e.clientY, t: Date.now(), dy: 0 };
+      panel.setPointerCapture(e.pointerId);
+      panel.classList.add('is-dragging');
+    });
+    panel.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      drag.dy = Math.max(0, e.clientY - drag.y);
+      panel.style.transform = 'translateY(' + drag.dy + 'px)';
+    });
+    var endDrag = function () {
+      if (!drag) return;
+      var fast = drag.dy > 30 && drag.dy / Math.max(1, Date.now() - drag.t) > 0.6;
+      var far = drag.dy > 100;
+      panel.classList.remove('is-dragging');
+      drag = null;
+      if (far || fast) close(true); else panel.style.transform = '';
+    };
+    panel.addEventListener('pointerup', endDrag);
+    panel.addEventListener('pointercancel', endDrag);
+  })();
 })();
