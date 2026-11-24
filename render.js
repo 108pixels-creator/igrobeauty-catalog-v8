@@ -312,21 +312,24 @@
     return { n: n, sum: sum };
   }
   var cartShown = null;
+  /* корзин две: в шапке и в нижней панели телефона (v8, 24.11) – обе показывают одно и то же */
   function renderCart() {
-    var btn = document.querySelector('[data-cart]');
-    if (!btn) return;
+    var btns = document.querySelectorAll('[data-cart]');
+    if (!btns.length) return;
     var t = cartTotals();
-    var badge = btn.querySelector('.ig-cart__count'), sum = btn.querySelector('.ig-cart__sum');
-    badge.hidden = !t.n;
-    badge.textContent = t.n > 99 ? '99+' : String(t.n);
-    sum.hidden = !t.n;
-    sum.textContent = rub(t.sum);
-    btn.setAttribute('aria-label', t.n ? 'Корзина: ' + goods(t.n) + ' на ' + rub(t.sum) : 'Корзина пуста');
-    /* кружок коротко увеличивается, когда товаров стало больше */
     var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (cartShown !== null && t.n > cartShown && badge.animate && !calm) {
-      badge.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.3)' }, { transform: 'scale(1)' }], { duration: 300, easing: 'ease-out' });
-    }
+    Array.prototype.forEach.call(btns, function (btn) {
+      var badge = btn.querySelector('.ig-cart__count'), sum = btn.querySelector('.ig-cart__sum');
+      badge.hidden = !t.n;
+      badge.textContent = t.n > 99 ? '99+' : String(t.n);
+      sum.hidden = !t.n;
+      sum.textContent = rub(t.sum);
+      btn.setAttribute('aria-label', t.n ? 'Корзина: ' + goods(t.n) + ' на ' + rub(t.sum) : 'Корзина пуста');
+      /* кружок коротко увеличивается, когда товаров стало больше */
+      if (cartShown !== null && t.n > cartShown && badge.animate && !calm) {
+        badge.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.3)' }, { transform: 'scale(1)' }], { duration: 300, easing: 'ease-out' });
+      }
+    });
     cartShown = t.n;
   }
   /* разметка счётчика количества (QuantityStepper ДС) — общая для карточки и script.js */
@@ -636,6 +639,52 @@
   /* «Каталог» в меню – на главную каталога (v8, 24.11: index.html – главная сайта, главная каталога – catalog.html) */
   var catLink = document.querySelector('[data-toggle="mega"]');
   if (catLink) catLink.setAttribute('href', link('catalog.html'));
+
+  /* ---------- шапка телефона по Figma 3631:26644 (v8, 24.11) ----------
+     Бургер и телефон по краям строки логотипа, слоган «в качестве постоянны», полоса категорий под поиском,
+     нижняя панель «Главная – Каталог – Избранное – Профиль – Корзина». На десктопе всё это скрыто стилями */
+  (function () {
+    var inner = document.querySelector('.ig-mast .ig-header__inner');
+    if (!inner || inner.querySelector('.ig-mburger')) return;
+    inner.insertAdjacentHTML('afterbegin',
+      '<button type="button" class="ig-mburger" data-mburger aria-label="Меню" aria-expanded="false">' +
+      '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg></button>');
+    var tel = document.querySelector('.ig-topbar__contacts a[href^="tel:"]');
+    inner.insertAdjacentHTML('beforeend',
+      '<a class="ig-mphone" href="' + (tel ? tel.getAttribute('href') : 'tel:+74951093333') + '" aria-label="Позвонить' + (tel ? ': ' + esc(tel.textContent) : '') + '">' +
+      '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" fill="none"/></svg></a>');
+    var logoEl = inner.querySelector('.ig-logo');
+    if (logoEl) logoEl.insertAdjacentHTML('beforeend', '<span class="ig-logo__motto-m" aria-hidden="true">в качестве<br>постоянны</span>');
+
+    /* полоса категорий: подписи и порядок – как в макете */
+    var navInner = document.querySelector('.ig-mast .ig-mainnav__inner');
+    var MCATS = [['Для волос', 'category.html'], ['Депиляция', 'category.html?id=depilation'], ['Брови и ресницы', 'category.html?id=brows'],
+      ['Косметология', 'category.html?id=cosmetology'], ['Ногтевой сервис', 'category.html?id=nails'], ['Загар', 'category.html?id=tanning'],
+      ['Одноразовая продукция', 'category.html?id=disposable'], ['Дезинфекция', 'category.html?id=disinfection']];
+    if (navInner) {
+      var first = navInner.querySelector('.ig-mainnav__list');
+      var cats = '<div class="ig-mcats">' + MCATS.map(function (c) { return '<a href="' + link(c[1]) + '">' + esc(c[0]) + '</a>'; }).join('') + '</div>';
+      if (first) first.insertAdjacentHTML('afterend', cats); else navInner.insertAdjacentHTML('beforeend', cats);
+      navInner.parentNode.insertAdjacentHTML('beforeend', '<span class="ig-mcats-fade" aria-hidden="true"></span>');
+    }
+
+    /* нижняя панель: «Главная» выбрана на главной сайта, «Каталог» – на остальных страницах */
+    var onHome = /(^|\/)(index\.html)?$/.test(location.pathname);
+    var ICON_HOME = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M3.5 10.2 12 3.5l8.5 6.7V20a.5.5 0 0 1-.5.5H4a.5.5 0 0 1-.5-.5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/><path d="M9 20.5v-6h6v6" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/></svg>';
+    var tab = function (href, ic, t, on) {
+      return '<a class="ig-tabbar__i' + (on ? ' is-active' : '') + '" href="' + href + '"' + (on ? ' aria-current="page"' : '') + '>' + ic + '<span class="ig-tabbar__t">' + t + '</span></a>';
+    };
+    document.body.insertAdjacentHTML('beforeend',
+      '<nav class="ig-tabbar" aria-label="Разделы">' +
+      tab(link('index.html'), ICON_HOME, 'Главная', onHome) +
+      tab(link('catalog.html'), '<i class="ig-ic ig-ic--grid" aria-hidden="true"></i>', 'Каталог', !onHome) +
+      tab('#', '<i class="ig-ic ig-ic--heart" aria-hidden="true"></i>', 'Избранное', false) +
+      tab('#', '<i class="ig-ic ig-ic--user" aria-hidden="true"></i>', 'Профиль', false) +
+      '<button type="button" class="ig-tabbar__i ig-cart" data-cart aria-label="Корзина пуста"><span class="ig-cart__icon"><i class="ig-ic ig-ic--cart" aria-hidden="true"></i><span class="ig-cart__count" aria-hidden="true" hidden></span></span>' +
+      '<span class="ig-cart__sum ig-tabbar__t" aria-hidden="true" hidden></span><span class="ig-tabbar__t ig-tabbar__empty">Корзина</span></button>' +
+      '</nav>');
+    document.body.classList.add('has-tabbar');
+  })();
 
   /* ---------- подвал: категории и служебная строка прототипа ---------- */
   var footNav = document.getElementById('ig-footer-nav');

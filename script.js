@@ -70,6 +70,8 @@
     megaEl.classList.toggle('is-open', open);
     megaEl.setAttribute('aria-hidden', open ? 'false' : 'true');
     if (catalogBtn) catalogBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    var mburger = document.querySelector('[data-mburger]');
+    if (mburger) mburger.setAttribute('aria-expanded', open ? 'true' : 'false');
     if (!open) megaByHover = false;
   }
 
@@ -86,6 +88,9 @@
     /* «Каталог» (03.11) – ссылка на главную каталога: клик ведёт туда, меню раскрывается наведением
        (с клавиатуры – стрелкой вниз) */
     if (t.closest('[data-toggle="mega"]')) return;
+    /* бургер шапки телефона (v8, 24.11) – пока открывает каталог во весь экран; своё меню бургера – этап 4 */
+    var burger = t.closest('[data-mburger]');
+    if (burger) { setMega(!megaOpen()); return; }
     if (t.closest('[data-mega-close]')) { setMega(false); if (catalogBtn) catalogBtn.focus(); return; }
     if (megaOpen() && !t.closest('#mega')) setMega(false);
     var catBtn = t.closest('.ig-mega__cat');
@@ -286,8 +291,13 @@
     var mastSlot = mast.parentNode;
     var mastNav = mast.querySelector('.ig-mainnav');
     var fullH = mast.offsetHeight, compactH = 60, navH = 40, navTopFull = 0;
+    /* телефон (v8, 24.11, Figma C-1/C-2): сжатая шапка – строка 56 px «бургер – поиск – телефон», при прокрутке
+       вверх – строка логотипа и поиск под ней (ещё 56 px); полоса категорий – только в полной шапке */
+    var mqPhone = window.matchMedia('(max-width: 767px)');
+    var PHONE_ROW = 56;
     var setMastH = function () {
       if (mast.classList.contains('is-compact')) return;
+      if (mqPhone.matches) { compactH = PHONE_ROW; navH = PHONE_ROW; }
       fullH = mast.offsetHeight;
       docEl.style.setProperty('--mast-h', fullH + 'px');
       var inner = mastNav && mastNav.querySelector('.ig-mainnav__inner');
@@ -297,7 +307,7 @@
     };
     /* высота компактной строки — когда шапка досжалась */
     mast.addEventListener('transitionend', function (e) {
-      if (e.target === mastNav && mast.classList.contains('is-collapsed')) compactH = mast.offsetHeight;
+      if (e.target === mastNav && mast.classList.contains('is-collapsed') && !mqPhone.matches) compactH = mast.offsetHeight;
     });
     var isCompact = function () { return mast.classList.contains('is-compact'); };
     var isCollapsed = function () { return mast.classList.contains('is-collapsed'); };
@@ -397,7 +407,11 @@
          без анимации – под ней на той же высоте уже меню полной шапки (27.10; до того её копия уезжала вверх,
          граница была по низу шапок) */
       var compact = isCompact()
-        ? y > slotTop + (isCollapsed() ? fullH : navTopFull) - compactH
+        ? (mqPhone.matches
+            /* телефон: сжатая с логотипом держится, пока полная не встала на место целиком – строки логотипа
+               и поиска у них на одной высоте, при смене добавляется только полоса категорий */
+            ? y > slotTop + (isCollapsed() ? fullH - compactH : 0)
+            : y > slotTop + (isCollapsed() ? fullH : navTopFull) - compactH)
         : y > slotTop + fullH;
       setCompact(compact);
       /* полная шапка всегда прозрачная (белая – только при наведении, фокусе или открытом каталоге), компактная – белая */
