@@ -23,7 +23,19 @@
 
 /* два больших баннера */
 .site-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 22px; }
-.site-hero a, .site-promo a { display: block; overflow: hidden; border-radius: 8px; }
+.site-hero a, .site-promo a { position: relative; display: block; overflow: hidden; border-radius: 8px; container-type: inline-size; }
+/* кнопка баннера – поверх картинки, при наведении не увеличивается (25.11): картинки без кнопок, размеры – доли ширины баннера,
+   как в Figma (большой 590: кнопка 159 × 44, кегль 17; малый 387: 116 × 30, кегль 11,8) */
+.site-bn__btn {
+  position: absolute; z-index: 1;
+  display: inline-flex; align-items: center; justify-content: center; gap: 2cqw;
+  width: 26.95cqw; height: 7.46cqw;
+  border-radius: 2px; background: #335351; color: #fff;
+  font-family: var(--font-ui); font-weight: var(--weight-semibold); font-size: 2.9cqw; letter-spacing: -0.01em; white-space: nowrap;
+  transition: background-color var(--duration-fast) ease;
+}
+.site-bn__btn--sm { width: 29.97cqw; height: 7.75cqw; border-radius: 1px; font-size: 3.04cqw; }
+.site-bn__btn i { font-style: normal; }
 .site-hero img, .site-promo img { display: block; width: 100%; height: auto; transition: transform var(--duration-base) var(--ease-standard); }
 @media (hover: hover) {
   .site-hero a:hover img, .site-promo a:hover img { transform: scale(1.02); }
@@ -32,7 +44,7 @@
 /* преимущества */
 .site-adv { display: flex; justify-content: space-between; align-items: center; margin: 30px 0; padding: 0 4px; }
 .site-adv__item { display: flex; align-items: center; gap: 14px; font-family: var(--font-heading); font-weight: var(--weight-semibold); font-size: 24px; text-transform: uppercase; color: #212121; }
-.site-adv__item img { display: block; height: 40px; width: auto; }
+.site-adv__item img { display: block; flex: none; width: auto; height: auto; max-height: 48px; }
 
 /* три баннера акций */
 .site-promo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
@@ -52,7 +64,8 @@
 .site-brands {
   display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 32px;
   margin-top: 56px; padding: 38px 30px 38px 44px;
-  border: 2px solid #50a27b; border-radius: 8px; background: var(--surface-page);
+  border-radius: 8px; background: #f9f9f9;   /* 25.11 по Figma 3592:495: без зелёной рамки, лёгкая тень */
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08), 0 0 0.5px rgba(0, 0, 0, 0.1);
 }
 .site-brands .site-h2 { text-align: left; margin-bottom: 14px; }
 .site-brands__txt { margin: 0; font-size: 15px; line-height: 1.4; color: var(--text-muted); }
@@ -87,9 +100,10 @@
 @media (hover: hover) { .site-card:hover { background: #fff; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); } }
 
 /* программа лояльности и вход – по блоку igrobeauty.ru, в палитре DS 3.2 */
-.site-loyal { padding: 48px 0; background: var(--surface-page); }
-.site-loyal__card { display: grid; grid-template-columns: 670px 1fr; max-width: 1180px; margin: 0 auto; border: 1px solid #e7e7e7; background: #fff; }
-.site-loyal__left { position: relative; padding: 32px 32px 28px; background: #edebe9; }
+.site-loyal { padding: 48px 0; background: #fff; }   /* 25.11 по Figma 3611:376: фон секции белый */
+.site-loyal__card { display: grid; grid-template-columns: 670px 1fr; max-width: 1180px; margin: 0 auto; border: 1px solid #e7e7e7; border-radius: 4px; overflow: hidden; background: #fff;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08), 0 0 0.5px rgba(0, 0, 0, 0.1); }
+.site-loyal__left { position: relative; padding: 32px 32px 28px; background: #f9f9f9; }   /* 25.11 по Figma: #F9F9F9 (было #EDEBE9) */
 .site-loyal__left h2 { margin: 0 0 30px; max-width: 460px; font-family: var(--font-heading); font-weight: 800; font-size: 32px; line-height: 1.15; color: #335351; }
 .site-loyal__gift { position: absolute; right: 0; top: 0; width: 200px; height: auto; }
 .site-perks { list-style: none; margin: 0 0 30px; padding: 0; display: grid; gap: 16px; }
